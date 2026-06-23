@@ -270,9 +270,10 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `errors.New("message")` creates a simple error
 - `fmt.Errorf("context: %w", err)` wraps an error with context — `%w` enables unwrapping
 - `errors.Is(err, target)` checks if an error anywhere in the chain matches a target value
+- `errors.As(err, &target)` extracts a specific error type from the chain — use when you need to access fields on a custom error type
 - Errors are values — no exceptions, no stack unwinding
 
-**Exclude:** custom error types with additional fields, `errors.As`, sentinel errors
+**Exclude:** sentinel errors
 
 **Notes:** Keep the explanation factual. The `%w` wrapping pattern is important for real code — show wrapping and `errors.Is` unwrapping as two separate examples. A hint that wrapping adds context for humans while preserving the original error for programmatic checks clarifies why both exist.
 
@@ -341,6 +342,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 **Cover:**
 - `type Name struct { Field Type }` — definition
+- Anonymous structs: `struct { Name string; Age int }` — used for ad-hoc data, JSON payloads, and test fixtures
 - Initialization with named fields: `Name{Field: value}` — preferred; positional also works
 - Field access: `instance.Field`
 - Pointer to struct: `&Name{...}` — field access is identical: `p.Field` (Go dereferences automatically)
@@ -349,7 +351,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - Struct embedding: a type included without a field name — its fields and methods are promoted to the outer struct
 - Struct tags: metadata attached to fields as backtick-delimited strings, read via reflection — `Field Type `json:"name,omitempty"``; common tags include `json`, `xml`, `yaml`, `db`; multiple key-value pairs are space-separated within a tag
 
-**Exclude:** anonymous structs beyond a mention, promoted field conflicts, exhaustive tag reference
+**Exclude:** promoted field conflicts, exhaustive tag reference
 
 **Notes:** Embedding is Go's primary composition mechanism — show a concrete example where an embedded type's method is called directly on the outer struct. Show struct tags with a complete example: a struct with `json` tags, then a brief note that `encoding/json` reads them via reflection to control serialization. The `omitempty` option is the most commonly used tag option — show it. The automatic pointer dereference for field access is worth a hint for C developers who expect `->`.
 
@@ -361,6 +363,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 **Cover:**
 - An interface is a set of method signatures: `type Stringer interface { String() string }`
+- Interface embedding: one interface can include another — `type ReadWriter interface { Reader; Writer }` combines their method sets
 - Any type that implements all methods satisfies the interface — no declaration, no `implements` keyword
 - The compiler verifies satisfaction at the point of assignment
 - Interfaces are typically small — one or two methods is idiomatic
@@ -369,7 +372,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - Safe type assertion: `v, ok := value.(ConcreteType)` — ok is false instead of panicking
 - Type switch: `switch v := value.(type) { case int: ... case string: ... }` — dispatch on concrete type
 
-**Exclude:** interface embedding, nil interface vs nil pointer distinction (too subtle here), reflect
+**Exclude:** nil interface vs nil pointer distinction (too subtle here), reflect
 
 **Notes:** The implicit satisfaction model is Go's most distinctive type feature — show a type satisfying an interface without any declaration. Small interfaces are not just style; the standard library is built on them (`io.Reader`, `io.Writer`) — worth one sentence. Type assertion and type switch deserve separate examples. A hint that `any` should be a last resort is factual: once a value is `any`, the compiler cannot check how it is used.
 
@@ -407,8 +410,9 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `go test -run TestName` runs a specific test by name (supports regex)
 - `go test -cover` reports test coverage
 - Benchmarks: `func BenchmarkName(b *testing.B)` with `for i := 0; i < b.N; i++`
+- Fuzz testing: `func FuzzName(f *testing.F)` with `f.Fuzz(func(t *testing.T, input string) { })` — built-in since Go 1.18
 
-**Exclude:** t.Helper(), mocking strategies, integration test build tags, fuzz testing
+**Exclude:** t.Helper(), mocking strategies, integration test build tags
 
 **Notes:** Table-driven tests are the dominant pattern in real Go codebases — show a complete example with a small table, t.Run, and t.Errorf. The fact that no external test framework is needed is worth stating once as a practical fact, not as praise. The testing package covers what most languages need third-party libraries for.
 
@@ -437,7 +441,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** Go's mechanism for passing values between goroutines.
 
 **Cover:**
-- `chan T` is a channel that carries values of type T
+- `chan T` is a channel that carries values of type T; `chan<- T` is send-only, `<-chan T` is receive-only — used in function signatures to enforce direction
 - `make(chan int)` creates an unbuffered channel; `make(chan int, n)` creates a buffered channel
 - `ch <- value` sends; `value := <-ch` receives
 - Unbuffered: both send and receive block until the other side is ready — this is the synchronization mechanism
@@ -447,7 +451,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `select { case v := <-ch1: ... case ch2 <- v: ... }` waits on multiple channel operations simultaneously
 - `select` with a `default` case is non-blocking — it executes default if no channel is ready
 
-**Exclude:** channel direction types in function signatures beyond a mention, channel of channels
+**Exclude:** channel of channels
 
 **Notes:** The blocking semantics of unbuffered channels — that both sides must be ready — is the core mental model. Show two goroutines synchronizing through an unbuffered channel as a concrete example. `select` deserves its own example showing timeout with `time.After`. A hint that sending on a closed channel panics (while receiving from a closed channel does not) prevents a real mistake.
 
@@ -497,10 +501,11 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `sync.RWMutex` — read-write lock; `RLock()`/`RUnlock()` for concurrent readers, `Lock()`/`Unlock()` for exclusive writers
 - `sync.WaitGroup` — wait for a collection of goroutines to finish; `Add(n)` sets count, `Done()` decrements, `Wait()` blocks until zero
 - `sync.Once` — execute a function exactly once across goroutines; `once.Do(func())`
+- `sync.Map` — specialized map for high-read/low-write concurrency; not a general replacement for regular maps
 - Use `defer mutex.Unlock()` to ensure unlock runs even if the function panics
 - Channels and `sync` primitives solve different problems — channels for communication, `sync` for shared-memory coordination
 
-**Exclude:** `sync.Pool`, `sync.Map`, `sync.Cond`, `sync/atomic` beyond a mention
+**Exclude:** `sync.Pool`, `sync.Cond`, `sync/atomic` beyond a mention
 
 **Notes:** Show Mutex, RWMutex, and WaitGroup as separate examples. The `defer Unlock()` pattern is critical — show it. A hint that a Mutex is not reentrant (calling `Lock()` twice from the same goroutine deadlocks) prevents a real mistake. A hint that `WaitGroup` methods should not be copied (pass by pointer) prevents a subtle bug.
 
