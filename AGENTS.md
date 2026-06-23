@@ -14,9 +14,9 @@ These apply to every document generated from this plan. The generating model mus
 
 1. **State the problem before the solution.** Every concept starts with one sentence explaining what it solves or why it exists.
 2. **No forward references.** A concept may only assume knowledge of concepts introduced in earlier documents.
-3. **One concept per document.** No tangents.
+3. **One concept per document, unless they naturally belong together.** Related ideas that reinforce each other can share a document. Do not cram unrelated topics together.
 4. **Be complete on fundamentals, selective on advanced topics.** Basic inventories — all types, all declaration forms, all loop variants — must be exhaustive. Omitting `int32` or `uint16` from a type list forces the reader elsewhere for something elementary. Selectivity applies to advanced and rarely-used features, not to the basic building blocks of the language.
-5. **Examples are focused and purposeful.** Multiple small examples are better than one overloaded example. Each example illustrates exactly one thing. Variable names must be descriptive, not single letters. No contrived complexity. Each example should be short enough to read in one glance.
+5. **Examples are focused and purposeful.** Multiple small examples are better than one overloaded example. Each example illustrates exactly one thing. Use descriptive variable names, but single letters are fine in short, self-explanatory functions (e.g. `func add(x, y int)`). No contrived complexity. Keep examples concise — use judgment, do not exceed what is needed to illustrate the point.
 6. **Omit edge cases unless they affect common usage.** If a gotcha only surfaces in unusual code, skip it.
 7. **No history, no trivia, no philosophy.** Not why Go was designed this way. Not how it compares to other languages. Just what it is and how it works.
 8. **No workarounds presented as wisdom.** If a pattern exists to compensate for a language limitation, say so plainly or skip it.
@@ -592,8 +592,7 @@ Rules you must follow without exception:
 - Cover only what is listed under "Cover" — nothing more
 - Do not mention anything listed under "Exclude"
 - Use multiple small focused examples — each illustrates exactly one thing
-- Each example must be short enough to read in one glance; use descriptive variable names, never single letters except conventional loop indices
-- Write explanation in short dense paragraphs, not bullet points
+- Each example should be concise; use descriptive variable names, but single letters are fine in short, self-explanatory functions
 - Hints are allowed only when they prevent a real misunderstanding — not as advice or recommendations
 - Do not use phrases like "it's worth noting", "keep in mind", "importantly", "best practice"
 - End when the topic is covered — no summary, no "now you know", no next steps
