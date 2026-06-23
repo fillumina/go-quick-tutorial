@@ -117,8 +117,9 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `go doc packagename.FunctionName` prints documentation for a specific symbol
 - `pkg.go.dev` is the web interface for all Go documentation — standard library and third-party packages
 - Reading standard library source code is practical and instructive — it is installed locally with Go
+- Doc-aware comments: `// Foo does something.` — the first sentence is the summary shown by `go doc`; comments must start with the identifier name; blank lines separate paragraphs
 
-**Exclude:** godoc server, generating documentation for your own packages
+**Exclude:** godoc server
 
 **Notes:** This document is a navigation guide, not an API reference. The goal is to give the reader enough orientation to find what they need without guessing. Emphasize that `go doc` works offline and is fast — it is the first tool to reach for. List the standard library areas in a way that gives a mental map without being exhaustive. A hint that the standard library source is readable and locally available is genuinely useful — experienced programmers often find it faster than documentation.
 
@@ -231,8 +232,9 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `switch value { case x: }` — no fallthrough by default; cases do not fall through automatically
 - `switch { case condition: }` — switch without a value works as an if-else chain
 - `break`, `continue`; labeled break exits a named outer loop
+- `goto label` — jumps to a labeled statement; rarely used, exists for deep nesting escape
 
-**Exclude:** goto, select (covered with channels), fallthrough keyword beyond a mention
+**Exclude:** select (covered with channels), fallthrough keyword beyond a mention
 
 **Notes:** The `if init; condition` pattern appears constantly in real Go code for error checks — show it with its own example. Range over string yields runes (Unicode code points) not bytes — a hint here prevents a real misunderstanding. Each loop form deserves its own small example. Switch cases can match multiple values with a comma: `case "a", "b":` — worth showing. A hint about the pre-Go 1.22 `for` loop variable capture bug (closures capturing the shared loop variable all see the final value) is useful — older code still exists.
 
@@ -271,9 +273,10 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `fmt.Errorf("context: %w", err)` wraps an error with context — `%w` enables unwrapping
 - `errors.Is(err, target)` checks if an error anywhere in the chain matches a target value
 - `errors.As(err, &target)` extracts a specific error type from the chain — use when you need to access fields on a custom error type
+- Sentinel errors: `var ErrNotFound = errors.New("not found")` — package-level error values returned by functions and checked with `errors.Is`
 - Errors are values — no exceptions, no stack unwinding
 
-**Exclude:** sentinel errors
+**Exclude:** nothing
 
 **Notes:** Keep the explanation factual. The `%w` wrapping pattern is important for real code — show wrapping and `errors.Is` unwrapping as two separate examples. A hint that wrapping adds context for humans while preserving the original error for programmatic checks clarifies why both exist.
 
@@ -372,7 +375,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - Safe type assertion: `v, ok := value.(ConcreteType)` — ok is false instead of panicking
 - Type switch: `switch v := value.(type) { case int: ... case string: ... }` — dispatch on concrete type
 
-**Exclude:** nil interface vs nil pointer distinction (too subtle here), reflect
+**Exclude:** reflect
 
 **Notes:** The implicit satisfaction model is Go's most distinctive type feature — show a type satisfying an interface without any declaration. Small interfaces are not just style; the standard library is built on them (`io.Reader`, `io.Writer`) — worth one sentence. Type assertion and type switch deserve separate examples. A hint that `any` should be a last resort is factual: once a value is `any`, the compiler cannot check how it is used.
 
@@ -603,6 +606,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - A struct with any uncomparable field (slice, map, function) cannot be used as a map key or compared with `==`
 - `defer` with a closure that captures loop variables sees the final value of those variables in Go < 1.22; Go 1.22+ captures per-iteration, but older code still exists
 - Predeclared identifiers are not true keywords — they are defined in the universe block and can be shadowed by local declarations. The shadowable identifiers are: `true`, `false`, `nil` (constants); `bool`, `byte`, `complex64`, `complex128`, `error`, `float32`, `float64`, `int`, `int8`, `int16`, `int32`, `int64`, `rune`, `string`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr` (types); `append`, `cap`, `close`, `complex`, `copy`, `delete`, `imag`, `len`, `make`, `new`, `panic`, `real`, `recover` (functions). Shadowing `true`, `false`, or `nil` is flagged by `go vet`; shadowing the rest is not.
+- A nil pointer assigned to an interface is NOT nil — the interface holds a type, so `var i interface{} = (*T)(nil); i != nil` is true. This is a frequent source of bugs when returning errors as interfaces.
 
 **Exclude:** version-specific behavior beyond the Go 1.22 loop variable change, cgo gotchas, race detector internals
 
