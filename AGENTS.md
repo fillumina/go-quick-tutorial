@@ -14,6 +14,10 @@ These apply to every document generated from this plan. The generating model mus
 
 1. **State the problem before the solution.** Every concept starts with one sentence explaining what it solves or why it exists.
 2. **No forward references.** A concept may only assume knowledge of concepts introduced in earlier documents.
+
+**Acceptable exceptions to principle 2:**
+- Document 16 mentions struct tags are "read via reflection" before reflection is covered in document 26 — the reference is incidental (the reader doesn't need to understand reflection to use struct tags) and avoids a circular dependency (reflection examples naturally use struct tags).
+- Document 18 (Type Definitions and Aliases) references `byte`/`rune` as aliases first introduced in document 05 without foreshadowing — the cross-reference is backward, not forward, and serves as clarification rather than a dependency.
 3. **One concept per document, unless they naturally belong together.** Related ideas that reinforce each other can share a document. Do not cram unrelated topics together.
 4. **Be complete on fundamentals, selective on advanced topics.** Basic inventories — all types, all declaration forms, all loop variants — must be exhaustive. Omitting `int32` or `uint16` from a type list forces the reader elsewhere for something elementary. Selectivity applies to advanced and rarely-used features, not to the basic building blocks of the language.
 5. **Examples are focused and purposeful.** Multiple small examples are better than one overloaded example. Each example illustrates exactly one thing. Use descriptive variable names, but single letters are fine in short, self-explanatory functions (e.g. `func add(x, y int)`). No contrived complexity. Keep examples concise — use judgment, do not exceed what is needed to illustrate the point.
@@ -129,7 +133,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `:=` — short declaration, type inferred, only inside functions
 - Go is statically typed; types cannot change after declaration
 - Zero values: every type has one (0, false, "", nil) — variables are never uninitialized
-- Full numeric type inventory: `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr`, `float32`, `float64`, `complex64`, `complex128`
+- Full numeric type inventory: `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr` (integer large enough to hold a pointer bit pattern, used with `unsafe`), `float32`, `float64`, `complex64`, `complex128`
 - `byte` is an alias for `uint8`; `rune` is an alias for `int32` representing a Unicode code point
 - `bool`, `string` — string is an immutable byte sequence, conventionally UTF-8
 - Type conversions are always explicit: `int(x)`, `float64(n)` — no implicit coercion
@@ -230,7 +234,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 **Exclude:** goto, select (covered with channels), fallthrough keyword beyond a mention
 
-**Notes:** The `if init; condition` pattern appears constantly in real Go code for error checks — show it with its own example. Range over string yields runes (Unicode code points) not bytes — a hint here prevents a real misunderstanding. Each loop form deserves its own small example. Switch cases can match multiple values with a comma: `case "a", "b":` — worth showing.
+**Notes:** The `if init; condition` pattern appears constantly in real Go code for error checks — show it with its own example. Range over string yields runes (Unicode code points) not bytes — a hint here prevents a real misunderstanding. Each loop form deserves its own small example. Switch cases can match multiple values with a comma: `case "a", "b":` — worth showing. A hint about the pre-Go 1.22 `for` loop variable capture bug (closures capturing the shared loop variable all see the final value) is useful — older code still exists.
 
 ---
 
@@ -245,10 +249,13 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - Functions are first-class values — assignable to variables, passable as arguments
 - Closures: a function literal that captures variables from its surrounding scope
 - Variadic functions: `func sum(values ...int)` — `values` is a slice inside the function; call with `sum(1, 2, 3)` or `sum(slice...)`
+- `defer expression` schedules a call to run when the surrounding function returns, regardless of how it returns
+- Deferred calls execute in LIFO order — last deferred runs first
+- Arguments to a deferred function are evaluated immediately at the `defer` statement, not when the deferred call runs
 
-**Exclude:** method values, defer (covered in document 23)
+**Exclude:** method values, defer cleanup patterns (covered in document 23)
 
-**Notes:** Multiple return values are central to Go's error handling — show a function returning (value, error) and a caller using both. Closures deserve their own small example showing captured variable mutation. The `...` spread syntax for calling variadic functions with a slice is a practical detail worth showing.
+**Notes:** Multiple return values are central to Go's error handling — show a function returning (value, error) and a caller using both. Closures deserve their own small example showing captured variable mutation. The `...` spread syntax for calling variadic functions with a slice is a practical detail worth showing. A hint that defer inside a loop defers until the enclosing function returns, not per iteration — this is a genuine footgun that causes resource exhaustion. Show the argument-evaluation-at-defer-time rule briefly with an example.
 
 ---
 
@@ -305,7 +312,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 **Exclude:** 2D slices, slice tricks, unsafe operations on slice headers
 
-**Notes:** The shared-underlying-array behavior of sub-slices is a real footgun — show it explicitly with an example that demonstrates mutation propagation. `append` returning a new slice header is also a common source of confusion — a hint that the original variable must be reassigned (`s = append(s, v)`) prevents a real mistake. Arrays are rarely used directly; slices are the practical type.
+**Notes:** The shared-underlying-array behavior of sub-slices is a real footgun — show it explicitly with an example that demonstrates mutation propagation. `append` returning a new slice header is also a common source of confusion — a hint that the original variable must be reassigned (`s = append(s, v)`) prevents a real mistake. Arrays are rarely used directly; slices are the practical type. A hint that `json.Marshal` produces `null` for a nil slice and `[]` for an empty slice prevents a real misunderstanding when serializing.
 
 ---
 
@@ -466,21 +473,18 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 23 — Defer and Cleanup Patterns
+### 23 — Cleanup Patterns
 
-**Scope:** How defer works and how it combines with error handling and context for resource cleanup.
+**Scope:** How defer combines with error handling and context for resource cleanup.
 
 **Cover:**
-- `defer expression` schedules a call to run when the surrounding function returns, regardless of how it returns
-- Deferred calls execute in LIFO order — last deferred runs first
-- Arguments to a deferred function are evaluated immediately, not when the deferred call runs
 - The canonical resource pattern: open, check error, defer close — in that exact order
 - `defer cancel()` placed immediately after `context.WithCancel` or `context.WithTimeout`
 - Early return on error is idiomatic — flat code without nesting is preferred over deeply nested error checks
 
-**Exclude:** panic/recover, named return values with defer
+**Exclude:** panic/recover, named return values with defer, defer basics (covered in document 11)
 
-**Notes:** This document consolidates patterns from functions (11), errors (12), and context (22) — it should feel like recognition, not new syntax. Show the open/check/defer pattern as a complete realistic example. A hint that defer inside a loop defers until the enclosing function returns, not the loop iteration — this is a genuine footgun that causes resource exhaustion. The argument-evaluation-at-defer-time rule also catches people — show it briefly.
+**Notes:** This document consolidates patterns from functions (11), errors (12), and context (22) — it should feel like recognition, not new syntax. Show the open/check/defer pattern as a complete realistic example.
 
 ---
 
@@ -581,20 +585,19 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** Corner cases and subtle behaviors that trip up experienced developers.
 
 **Cover:**
-- `append` may reallocate the underlying array — the returned slice header may point to a different array; always reassign: `s = append(s, v)`
-- Sub-slicing shares the underlying array — mutating a sub-slice mutates the original; the original array cannot be garbage-collected until all sub-slices are gone
-- `nil` slice and empty slice both have length 0, but `json.Marshal` produces `null` for nil and `[]` for empty
-- `defer` evaluates arguments at the time of the `defer` statement, not when the deferred function runs
-- `defer` inside a loop defers until the enclosing function returns — not per iteration; this causes resource exhaustion
-- `for` loop variable: in Go before 1.22, the loop variable was shared across iterations; closures capturing it all see the final value. Go 1.22+ creates a new variable per iteration, but older code still exists
-- `map` iteration order is randomized by design — never depend on it
-- `recover()` only works inside a `defer`red function — calling it directly always returns `nil`
-- `sync.WaitGroup` must not be copied — pass by pointer, or keep as a struct field
-- `sync.Mutex` is not reentrant — locking twice from the same goroutine deadlocks
-- Sending on a closed channel panics; receiving from a closed channel returns the zero value immediately
-- A nil map reads return the zero value with `ok=false`; writing to a nil map panics
 - `time.Duration` is just `int64` nanoseconds — arithmetic works, but the type prevents mixing with plain integers
 - `strings.Builder` and `bytes.Buffer` are not concurrency-safe — do not share across goroutines
+- `append` can mutate the backing array of another slice if the destination has spare capacity — a sub-slice appended to may silently alter the original
+- Slices cannot be compared with `==` — it is a compile error; use `reflect.DeepEqual` or `slices.Equal` instead
+- Sending on a `nil` channel blocks forever (does not panic); receiving from a `nil` channel also blocks forever
+- Mixing pointer and value receivers on the same type is legal but breaks interface satisfaction — a `*T` satisfies interfaces with pointer receivers, but `T` does not
+- `string([]byte)` and `[]byte(string)` always allocate a copy — there is no zero-copy conversion between strings and byte slices
+- JSON unmarshaling into `interface{}` decodes numbers as `float64` — large integers lose precision; use `json.Decoder.UseNumber()` or a typed target
+- `for range` creates a copy of each element — mutating the range variable does not mutate the underlying collection; mutate via index instead
+- `fmt.Sprintf("%s", someBytes)` works, but `fmt.Sprintf("%s", someString)` and `fmt.Sprintf("%s", someBytes)` are not interchangeable with `%v` — `%v` adds brackets to slices
+- A struct with any uncomparable field (slice, map, function) cannot be used as a map key or compared with `==`
+- `defer` with a closure that captures loop variables sees the final value of those variables in Go < 1.22; Go 1.22+ captures per-iteration, but older code still exists
+- Predeclared identifiers are not true keywords — they are defined in the universe block and can be shadowed by local declarations. The shadowable identifiers are: `true`, `false`, `nil` (constants); `bool`, `byte`, `complex64`, `complex128`, `error`, `float32`, `float64`, `int`, `int8`, `int16`, `int32`, `int64`, `rune`, `string`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr` (types); `append`, `cap`, `close`, `complex`, `copy`, `delete`, `imag`, `len`, `make`, `new`, `panic`, `real`, `recover` (functions). Shadowing `true`, `false`, or `nil` is flagged by `go vet`; shadowing the rest is not.
 
 **Exclude:** version-specific behavior beyond the Go 1.22 loop variable change, cgo gotchas, race detector internals
 
