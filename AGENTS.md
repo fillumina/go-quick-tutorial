@@ -223,7 +223,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `if condition { }` — no parentheses around condition; braces are mandatory
 - `if init; condition { }` — init statement in if; the init variable is scoped to the if block
 - `for` is the only loop construct: `for i := 0; i < n; i++ { }`, `for condition { }` (while equivalent), `for { }` (infinite)
-- `for index, value := range collection { }` — iterates arrays, slices, maps, strings, channels
+- `for index, value := range collection { }` — iterates arrays, slices, maps, strings (channels are covered later)
 - `switch value { case x: }` — no fallthrough by default; cases do not fall through automatically
 - `switch { case condition: }` — switch without a value works as an if-else chain
 - `break`, `continue`; labeled break exits a named outer loop
@@ -340,10 +340,11 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - Methods: `func (receiver TypeName) MethodName() ReturnType { }` — a function bound to a type
 - Value receiver vs pointer receiver: pointer receiver can mutate the struct and avoids copying; use consistently across a type's methods
 - Struct embedding: a type included without a field name — its fields and methods are promoted to the outer struct
+- Struct tags: metadata attached to fields as backtick-delimited strings, read via reflection — `Field Type `json:"name,omitempty"``; common tags include `json`, `xml`, `yaml`, `db`; multiple key-value pairs are space-separated within a tag
 
-**Exclude:** struct tags beyond a mention, anonymous structs beyond a mention, promoted field conflicts
+**Exclude:** anonymous structs beyond a mention, promoted field conflicts, exhaustive tag reference
 
-**Notes:** Embedding is Go's primary composition mechanism — show a concrete example where an embedded type's method is called directly on the outer struct. Struct tags (e.g. `json:"name"`) appear in real code constantly — one sentence saying they exist and are used for serialization is enough; the reader will encounter them. The automatic pointer dereference for field access is worth a hint for C developers who expect `->`.
+**Notes:** Embedding is Go's primary composition mechanism — show a concrete example where an embedded type's method is called directly on the outer struct. Show struct tags with a complete example: a struct with `json` tags, then a brief note that `encoding/json` reads them via reflection to control serialization. The `omitempty` option is the most commonly used tag option — show it. The automatic pointer dereference for field access is worth a hint for C developers who expect `->`.
 
 ---
 
@@ -572,6 +573,32 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Exclude:** constraint interface syntax in depth, type inference edge cases, golang.org/x/exp/constraints (superseded by stdlib)
 
 **Notes:** Be direct that generic methods (methods with their own type parameters independent of the type) are not supported — this differs from most languages with generics and will surprise readers. Show a generic function and a generic type as separate examples. A hint that most application code does not need to define generics — but will use them via the standard library's slices and maps packages — sets accurate expectations.
+
+---
+
+### 29 — Common Gotchas
+
+**Scope:** Corner cases and subtle behaviors that trip up experienced developers.
+
+**Cover:**
+- `append` may reallocate the underlying array — the returned slice header may point to a different array; always reassign: `s = append(s, v)`
+- Sub-slicing shares the underlying array — mutating a sub-slice mutates the original; the original array cannot be garbage-collected until all sub-slices are gone
+- `nil` slice and empty slice both have length 0, but `json.Marshal` produces `null` for nil and `[]` for empty
+- `defer` evaluates arguments at the time of the `defer` statement, not when the deferred function runs
+- `defer` inside a loop defers until the enclosing function returns — not per iteration; this causes resource exhaustion
+- `for` loop variable: in Go before 1.22, the loop variable was shared across iterations; closures capturing it all see the final value. Go 1.22+ creates a new variable per iteration, but older code still exists
+- `map` iteration order is randomized by design — never depend on it
+- `recover()` only works inside a `defer`red function — calling it directly always returns `nil`
+- `sync.WaitGroup` must not be copied — pass by pointer, or keep as a struct field
+- `sync.Mutex` is not reentrant — locking twice from the same goroutine deadlocks
+- Sending on a closed channel panics; receiving from a closed channel returns the zero value immediately
+- A nil map reads return the zero value with `ok=false`; writing to a nil map panics
+- `time.Duration` is just `int64` nanoseconds — arithmetic works, but the type prevents mixing with plain integers
+- `strings.Builder` and `bytes.Buffer` are not concurrency-safe — do not share across goroutines
+
+**Exclude:** version-specific behavior beyond the Go 1.22 loop variable change, cgo gotchas, race detector internals
+
+**Notes:** This document is the last one — the reader now understands all the concepts. Each gotcha should be presented as: the behavior, why it happens, and a minimal example showing the pitfall. No new concepts should be introduced. The tone is factual, not alarmist. This is not a "best practices" document — it is a "here is what actually happens" document.
 
 ---
 
