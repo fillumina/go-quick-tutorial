@@ -1,6 +1,6 @@
 # 15 — Structs
 
-A struct groups named fields into a composite type. Structs are Go's primary mechanism for organizing data, and they serve as the foundation for methods and embedding.
+A struct groups named fields into a composite type.
 
 ## Definition
 
@@ -69,7 +69,7 @@ fmt.Println(p.Greet())  // Hi, I'm Alice
 
 ### Receivers
 
-A method uses a type as its receiver. A value receiver (`func (p Person)`) gets a copy; a pointer receiver (`func (p *Person)`) gets the address and can modify the original. The full explanation of value vs pointer receivers, including when to use each, is covered in document 15.
+A method uses a type as its receiver. A value receiver (`func (p Person)`) gets a copy; a pointer receiver (`func (p *Person)`) gets the address and can modify the original. The full explanation of value vs pointer receivers, including when to use each, is covered in document 16.
 
 ## Struct Embedding
 
@@ -92,23 +92,35 @@ type Person struct {
 }
 
 p := Person{
-    Name: "Alice",
-    Age:  30,
-    Address: Address{
-        City:    "London",
-        Country: "UK",
-    },
+    Name:    "Alice",
+    Age:     30,
+    City:    "London",
+    Country: "UK",
 }
+```
 
-fmt.Println(p.City)        // London — promoted field
-fmt.Println(p.Location())  // London, UK — promoted method
+You can also initialize using the embedded type name explicitly, or mix both approaches:
+
+```go
+p := Person{
+    Name:    "Alice",
+    Age:     30,
+    Address: Address{City: "London", Country: "UK"},
+}
+```
+
+The initialization form has no effect on field access. Regardless of how the struct was created, promoted fields can always be accessed directly or through the embedded type name, and both forms are interchangeable anywhere in the code:
+
+```go
+p.City = "Milan"           // direct access
+fmt.Println(p.Address.City) // explicit path, equivalent
 ```
 
 Embedding is Go's primary composition mechanism. It is not inheritance — the embedded type is not a subtype of the outer struct.
 
 ## Struct Tags
 
-Tags are metadata attached to fields as backtick-delimited strings, read via reflection:
+Tags are metadata attached to fields as backtick-delimited strings, read via reflection (see chapter 27):
 
 ```go
 type User struct {
