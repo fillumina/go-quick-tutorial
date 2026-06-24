@@ -74,27 +74,7 @@ for {
 
 ### Range Loop
 
-Iterate over arrays, slices, maps, and strings:
-
-```go
-names := []string{"Alice", "Bob", "Carol"}
-for i, name := range names {
-    fmt.Println(i, name)  // 0 Alice, 1 Bob, 2 Carol
-}
-```
-
-Range over a string yields runes (Unicode code points), not bytes:
-
-```go
-for i, r := range "cafe\u0301" {
-    fmt.Printf("%d %c\n", i, r)
-    // 0 c
-    // 1 a
-    // 2 f
-    // 3 e
-    // 4 ́   (combining accent, 3 bytes in UTF-8)
-}
-```
+`for..range` iterates over arrays, slices, maps, strings, and channels. Covered in document 14.
 
 ## Switch
 

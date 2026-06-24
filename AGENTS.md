@@ -226,15 +226,15 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `if condition { }` — no parentheses around condition; braces are mandatory
 - `if init; condition { }` — init statement in if; the init variable is scoped to the if block
 - `for` is the only loop construct: `for i := 0; i < n; i++ { }`, `for condition { }` (while equivalent), `for { }` (infinite)
-- `for index, value := range collection { }` — iterates arrays, slices, maps, strings (channels are covered later)
+- `for..range` is covered in document 14
 - `switch value { case x: }` — no fallthrough by default; cases do not fall through automatically
 - `switch { case condition: }` — switch without a value works as an if-else chain
 - `break`, `continue`; labeled break exits a named outer loop
 - `goto label` — jumps to a labeled statement; rarely used, exists for deep nesting escape
 
-**Exclude:** select (covered with channels), fallthrough keyword beyond a mention
+**Exclude:** select (covered with channels), fallthrough keyword beyond a mention, range loop (covered in document 14)
 
-**Notes:** The `if init; condition` pattern appears constantly in real Go code for error checks — show it with its own example. Range over string yields runes (Unicode code points) not bytes — a hint here prevents a real misunderstanding. Each loop form deserves its own small example. Switch cases can match multiple values with a comma: `case "a", "b":` — worth showing. A hint about the pre-Go 1.22 `for` loop variable capture bug (closures capturing the shared loop variable all see the final value) is useful — older code still exists.
+**Notes:** The `if init; condition` pattern appears constantly in real Go code for error checks — show it with its own example. Each loop form deserves its own small example. Switch cases can match multiple values with a comma: `case "a", "b":` — worth showing. A hint about the pre-Go 1.22 `for` loop variable capture bug (closures capturing the shared loop variable all see the final value) is useful — older code still exists.
 
 ---
 
@@ -320,7 +320,26 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 14 — Structs
+### 14 — Range
+
+**Scope:** How `for..range` iterates over arrays, slices, maps, strings, and channels.
+
+**Cover:**
+
+- Range over arrays and slices yields index and a copy of each element
+- Range over maps yields key-value pairs; iteration order is intentionally random
+- Range over strings yields byte offset and rune (Unicode code point); invalid UTF-8 produces `U+FFFD` replacement character
+- Range over channels receives values until the channel is closed
+- The blank identifier discards index or value: `for _, v := range` or `for i := range`
+- Range creates copies — mutating the range variable does not mutate the underlying collection; use the index to mutate
+
+**Exclude:** range over channels in depth (covered with channels in document 22)
+
+**Notes:** The copy semantics of range is a genuine footgun — show it explicitly with an example that demonstrates the mutation pitfall and the index-based workaround. Range over strings yielding runes (not bytes) is a frequent source of confusion — show the byte offset vs rune position distinction. The `for i := range` form (index only) is the idiomatic way to mutate every element of a slice — show it.
+
+---
+
+### 15 — Structs
 
 **Scope:** Go's composite type for grouping named fields.
 
@@ -341,7 +360,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 15 — Pointers
+### 16 — Pointers
 
 **Scope:** How pointers work in Go and how they enable mutation and receiver semantics.
 
@@ -356,13 +375,13 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - Pointer receiver: `func (r *TypeName) MethodName()` — can mutate the receiver; preferred for large structs to avoid copying
 - Value receiver vs pointer receiver: use consistently across a type's methods; mixing them breaks interface satisfaction
 
-**Exclude:** unsafe.Pointer (covered in document 27), stack vs heap allocation, escape analysis
+**Exclude:** unsafe.Pointer (covered in document 28), stack vs heap allocation, escape analysis
 
 **Notes:** Show value-passing vs pointer-passing as two side-by-side examples — this is the clearest way to make the distinction concrete. The no-pointer-arithmetic fact is a one-line hint for C developers. A hint that Go decides stack vs heap allocation automatically (the programmer does not control this) prevents confusion for C/C++ developers. Show a pointer receiver method that mutates a struct, contrasted with a value receiver that cannot. The automatic pointer dereference for field access (`p.Field` instead of `p->Field`) is worth a hint for C developers.
 
 ---
 
-### 16 — Interfaces
+### 17 — Interfaces
 
 **Scope:** Go's mechanism for defining behavior independent of concrete types.
 
@@ -384,7 +403,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 17 — Error Handling
+### 18 — Error Handling
 
 **Scope:** How Go signals and handles errors.
 
@@ -406,7 +425,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 18 — Type Definitions and Aliases
+### 19 — Type Definitions and Aliases
 
 **Scope:** How Go creates named types from existing types, and how type aliases differ.
 
@@ -425,7 +444,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 19 — Testing
+### 20 — Testing
 
 **Scope:** How Go's built-in testing works.
 
@@ -448,7 +467,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 20 — Goroutines
+### 21 — Goroutines
 
 **Scope:** Go's lightweight concurrency primitive.
 
@@ -467,7 +486,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 21 — Channels
+### 22 — Channels
 
 **Scope:** Go's mechanism for passing values between goroutines.
 
@@ -489,7 +508,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 22 — Context
+### 23 — Context
 
 **Scope:** How Go propagates cancellation and deadlines across function call chains.
 
@@ -510,7 +529,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 23 — Cleanup Patterns
+### 24 — Cleanup Patterns
 
 **Scope:** How defer combines with error handling and context for resource cleanup.
 
@@ -526,7 +545,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 24 — Sync Package
+### 25 — Sync Package
 
 **Scope:** Go's non-channel concurrency primitives for mutual exclusion and coordination.
 
@@ -546,7 +565,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 25 — Init Function
+### 26 — Init Function
 
 **Scope:** How Go runs initialization code before `main()`.
 
@@ -564,7 +583,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 26 — Reflection
+### 27 — Reflection
 
 **Scope:** How Go programs can inspect and manipulate values and types at runtime.
 
@@ -584,7 +603,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 27 — Unsafe
+### 28 — Unsafe
 
 **Scope:** What the `unsafe` package does and what its presence in code means.
 
@@ -603,7 +622,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 28 — Generics
+### 29 — Generics
 
 **Scope:** Go's type parameter system introduced in Go 1.18.
 
@@ -624,7 +643,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 29 — Common Gotchas
+### 30 — Common Gotchas
 
 **Scope:** Corner cases and subtle behaviors that trip up experienced developers.
 

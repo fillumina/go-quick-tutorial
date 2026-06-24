@@ -40,7 +40,7 @@ p.Age = 31
 
 ## Anonymous Structs
 
-Structs can be defined inline without a named type:
+Structs can be defined inline without a named type, the first part is the *type definition* and the second part is the *literal* that defines the actual values:
 
 ```go
 config := struct {
