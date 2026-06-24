@@ -1,4 +1,4 @@
-# 15 — Maps
+# 13 — Maps
 
 A map is Go's built-in key-value type. Keys must be comparable (support `==`). Values can be any type.
 

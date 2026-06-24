@@ -1,22 +1,22 @@
-# 11 — Functions
+# 10 — Functions
 
 Functions are the primary unit of code organization in Go. They support multiple return values, closures, variadic arguments, and deferred execution.
 
 ## Declaration
 
 ```go
-func greet(name string) string {
-    return "Hello, " + name
+func length(s string) int {
+    return len(s)
 }
 
-result := greet("Alice")
+result := length("Alice")  // 5
 ```
 
 Multiple parameters of the same type share the type annotation:
 
 ```go
-func add(x, y int) int {
-    return x + y
+func lessThan(a, b int) bool {
+    return a < b
 }
 ```
 
@@ -59,23 +59,23 @@ Named returns reduce repetition but reduce clarity. Use them sparingly.
 Functions are first-class values — assignable to variables and passable as arguments:
 
 ```go
-type Filter func(int) bool
+type Selector func(int) bool
 
 func isEven(n int) bool {
     return n%2 == 0
 }
 
-func filter(numbers []int, f Filter) []int {
+func selectAll(numbers []int, s Selector) []int {
     var result []int
     for _, n := range numbers {
-        if f(n) {
+        if s(n) {
             result = append(result, n)
         }
     }
     return result
 }
 
-evens := filter([]int{1, 2, 3, 4, 5, 6}, isEven)
+evens := selectAll([]int{1, 2, 3, 4, 5, 6}, isEven)
 ```
 
 ## Closures
@@ -83,49 +83,52 @@ evens := filter([]int{1, 2, 3, 4, 5, 6}, isEven)
 A closure is a function literal that captures variables from its surrounding scope:
 
 ```go
-func makeCounter() func() int {
-    count := 0
+func makeCounter(start int) func() int {
+    seed := 1000
     return func() int {
-        count++
-        return count
+        start++
+        return seed + start
     }
 }
 
-counter := makeCounter()
-fmt.Println(counter())  // 1
-fmt.Println(counter())  // 2
+counter := makeCounter(0)
+fmt.Println(counter())  // 1001
+fmt.Println(counter())  // 1002
 ```
 
-The captured variable is shared, not copied. Each call to the closure sees the updated value.
+The closure captures both `start` (a parameter) and `seed` (a local variable). Both persist across calls.
 
 ## Variadic Functions
 
-A variadic function accepts a variable number of arguments of the same type:
+A variadic function accepts a variable number of arguments of the same type. The variadic parameter must be the last parameter:
 
 ```go
-func sum(values ...int) int {
+func sum(scale float64, values ...int) float64 {
     total := 0
     for _, v := range values {
         total += v
     }
-    return total
+    return float64(total) * scale
 }
 
-sum(1, 2, 3)       // 6
-sum(1, 2, 3, 4, 5) // 15
-sum()              // 0
+sum(1, 1, 2, 3)       // 6
+sum(0.1, 1, 2, 3)     // 0.6
+sum(10, 1, 2, 3, 4, 5) // 150
 ```
 
-Inside the function, `values` is a slice. Call with a slice using `...` to spread its elements:
+`values` is a slice inside the function. To pass a slice or array as variadic arguments, use the spread notation `...`:
 
 ```go
-numbers := []int{1, 2, 3, 4, 5}
-total := sum(numbers...)  // 15
+slice := []int{1, 2, 3, 4, 5}
+total := sum(1, slice...)  // 15
+
+array := [3]int{1, 2, 3}
+total := sum(1, array...)  // 6
 ```
 
 ## Defer
 
-`defer` schedules a function call to run when the surrounding function returns, regardless of how it returns:
+`defer` schedules a function call to run when the surrounding function returns, regardless of how it returns. The defer statement can appear anywhere in the function, as long as it is reached before the return:
 
 ```go
 func process() {

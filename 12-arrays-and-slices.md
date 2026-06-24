@@ -1,4 +1,4 @@
-# 14 — Arrays and Slices
+# 12 — Arrays and Slices
 
 Go provides arrays for fixed-size sequences and slices for variable-length views over underlying arrays. Slices are the everyday sequence type.
 

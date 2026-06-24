@@ -17,7 +17,7 @@ These apply to every document generated from this plan. The generating model mus
 
 **Known exceptions (listed to avoid re-proposing them at each review, not exhaustive):**
 
-- Document 15 mentions struct tags are "read via reflection" before reflection is covered in document 26 — the reference is incidental (the reader doesn't need to understand reflection to use struct tags) and avoids a circular dependency (reflection examples naturally use struct tags).
+- Document 14 mentions struct tags are "read via reflection" before reflection is covered in document 26 — the reference is incidental (the reader doesn't need to understand reflection to use struct tags) and avoids a circular dependency (reflection examples naturally use struct tags).
 - Document 18 (Type Definitions and Aliases) references `byte`/`rune` as aliases first introduced in document 05 without foreshadowing — the cross-reference is backward, not forward, and serves as clarification rather than a dependency.
 
 Other forward references are acceptable when inevitable. Use judgment — an experienced developer won't object to seeing a concept before it's formally introduced.
@@ -260,29 +260,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 11 — Error Handling
-
-**Scope:** How Go signals and handles errors.
-
-**Cover:**
-
-- `error` is a built-in interface with a single method: `Error() string`
-- The convention: functions return `(result, error)` as the last value
-- The pattern: `result, err := doSomething(); if err != nil { handle }`
-- `errors.New("message")` creates a simple error
-- `fmt.Errorf("context: %w", err)` wraps an error with context — `%w` enables unwrapping
-- `errors.Is(err, target)` checks if an error anywhere in the chain matches a target value
-- `errors.As(err, &target)` extracts a specific error type from the chain — use when you need to access fields on a custom error type
-- Sentinel errors: `var ErrNotFound = errors.New("not found")` — package-level error values returned by functions and checked with `errors.Is`
-- Errors are values — no exceptions, no stack unwinding
-
-**Exclude:** nothing
-
-**Notes:** Keep the explanation factual. The `%w` wrapping pattern is important for real code — show wrapping and `errors.Is` unwrapping as two separate examples. A hint that wrapping adds context for humans while preserving the original error for programmatic checks clarifies why both exist.
-
----
-
-### 12 — Panic and Recover
+### 11 — Panic and Recover
 
 **Scope:** How Go handles abnormal termination and controlled recovery from runtime failures.
 
@@ -301,7 +279,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 13 — Arrays and Slices
+### 12 — Arrays and Slices
 
 **Scope:** Go's two sequence types and how they relate.
 
@@ -322,7 +300,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 14 — Maps
+### 13 — Maps
 
 **Scope:** Go's built-in key-value type.
 
@@ -342,7 +320,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 15 — Structs
+### 14 — Structs
 
 **Scope:** Go's composite type for grouping named fields.
 
@@ -363,7 +341,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 16 — Pointers
+### 15 — Pointers
 
 **Scope:** How pointers work in Go and how they enable mutation and receiver semantics.
 
@@ -378,13 +356,13 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - Pointer receiver: `func (r *TypeName) MethodName()` — can mutate the receiver; preferred for large structs to avoid copying
 - Value receiver vs pointer receiver: use consistently across a type's methods; mixing them breaks interface satisfaction
 
-**Exclude:** unsafe.Pointer (covered in document 28), stack vs heap allocation, escape analysis
+**Exclude:** unsafe.Pointer (covered in document 27), stack vs heap allocation, escape analysis
 
 **Notes:** Show value-passing vs pointer-passing as two side-by-side examples — this is the clearest way to make the distinction concrete. The no-pointer-arithmetic fact is a one-line hint for C developers. A hint that Go decides stack vs heap allocation automatically (the programmer does not control this) prevents confusion for C/C++ developers. Show a pointer receiver method that mutates a struct, contrasted with a value receiver that cannot. The automatic pointer dereference for field access (`p.Field` instead of `p->Field`) is worth a hint for C developers.
 
 ---
 
-### 17 — Interfaces
+### 16 — Interfaces
 
 **Scope:** Go's mechanism for defining behavior independent of concrete types.
 
@@ -403,6 +381,28 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Exclude:** reflect
 
 **Notes:** The implicit satisfaction model is Go's most distinctive type feature — show a type satisfying an interface without any declaration. Small interfaces are not just style; the standard library is built on them (`io.Reader`, `io.Writer`) — worth one sentence. Type assertion and type switch deserve separate examples. A hint that `any` should be a last resort is factual: once a value is `any`, the compiler cannot check how it is used.
+
+---
+
+### 17 — Error Handling
+
+**Scope:** How Go signals and handles errors.
+
+**Cover:**
+
+- `error` is a built-in interface with a single method: `Error() string`
+- The convention: functions return `(result, error)` as the last value
+- The pattern: `result, err := doSomething(); if err != nil { handle }`
+- `errors.New("message")` creates a simple error
+- `fmt.Errorf("context: %w", err)` wraps an error with context — `%w` enables unwrapping
+- `errors.Is(err, target)` checks if an error anywhere in the chain matches a target value
+- `errors.As(err, &target)` extracts a specific error type from the chain — use when you need to access fields on a custom error type
+- Sentinel errors: `var ErrNotFound = errors.New("not found")` — package-level error values returned by functions and checked with `errors.Is`
+- Errors are values — no exceptions, no stack unwinding
+
+**Exclude:** nothing
+
+**Notes:** Keep the explanation factual. The `%w` wrapping pattern is important for real code — show wrapping and `errors.Is` unwrapping as two separate examples. A hint that wrapping adds context for humans while preserving the original error for programmatic checks clarifies why both exist.
 
 ---
 
@@ -463,7 +463,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 **Exclude:** GOMAXPROCS, goroutine scheduling internals, runtime.Gosched
 
-**Notes:** Keep this document short and factual — its purpose is to establish the mental model before channels are introduced. Show a simple goroutine launch. A hint that goroutine leaks (goroutines that block forever) accumulate silently and consume memory is worth stating — context (document 22) addresses cancellation. Mention `-race` because it is a practical tool readers will want when reviewing concurrent code.
+**Notes:** Keep this document short and factual — its purpose is to establish the mental model before channels are introduced. Show a simple goroutine launch. A hint that goroutine leaks (goroutines that block forever) accumulate silently and consume memory is worth stating — context (document 21) addresses cancellation. Mention `-race` because it is a practical tool readers will want when reviewing concurrent code.
 
 ---
 
@@ -522,7 +522,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 **Exclude:** panic/recover, named return values with defer, defer basics (covered in document 10)
 
-**Notes:** This document consolidates patterns from functions (10), errors (11), and context (22) — it should feel like recognition, not new syntax. Show the open/check/defer pattern as a complete realistic example.
+**Notes:** This document consolidates patterns from functions (10), errors (16), and context (21) — it should feel like recognition, not new syntax. Show the open/check/defer pattern as a complete realistic example.
 
 ---
 

@@ -1,4 +1,4 @@
-# 12 — Error Handling
+# 17 — Error Handling
 
 Go signals errors through return values, not exceptions. The `error` type is a built-in interface, and the convention is to return errors as the last value from functions that may fail.
 

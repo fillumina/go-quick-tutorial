@@ -36,18 +36,18 @@ Each chapter covers exactly one concept, builds on the previous ones, and moves 
 |---|-------|--------|
 | 09 | [Control Flow](09-control-flow.md) | `if`, `for` (all forms), `range`, `switch`, `break`, `continue`, `goto` |
 | 10 | [Functions](10-functions.md) | Signatures, multiple returns, closures, variadic functions, `defer` |
-| 11 | [Error Handling](11-error-handling.md) | `error` interface, `(result, error)` pattern, wrapping with `%w`, `errors.Is`/`As` |
-| 12 | [Panic and Recover](12-panic-and-recover.md) | `panic()`, `recover()`, deferred recovery pattern |
+| 17 | [Error Handling](17-error-handling.md) | `error` interface, `(result, error)` pattern, wrapping with `%w`, `errors.Is`/`As` |
+| 11 | [Panic and Recover](11-panic-and-recover.md) | `panic()`, `recover()`, deferred recovery pattern |
 
 ### Data Structures
 
 | # | Topic | Covers |
 |---|-------|--------|
-| 13 | [Arrays and Slices](13-arrays-and-slices.md) | Fixed-size arrays, slices, `make`, `append`, slicing, `len`/`cap`, nil vs empty |
-| 14 | [Maps](14-maps.md) | `map[K]V`, `make`, existence checks, `delete`, random iteration order |
-| 15 | [Structs](15-structs.md) | Struct definition, methods, value vs pointer receivers, embedding, struct tags |
-| 16 | [Pointers](16-pointers.md) | `*T`, `&`, dereferencing, pointer receivers, no pointer arithmetic |
-| 17 | [Interfaces](17-interfaces.md) | Method sets, implicit satisfaction, type assertion, type switch, `any` |
+| 12 | [Arrays and Slices](12-arrays-and-slices.md) | Fixed-size arrays, slices, `make`, `append`, slicing, `len`/`cap`, nil vs empty |
+| 13 | [Maps](13-maps.md) | `map[K]V`, `make`, existence checks, `delete`, random iteration order |
+| 14 | [Structs](14-structs.md) | Struct definition, methods, value vs pointer receivers, embedding, struct tags |
+| 15 | [Pointers](15-pointers.md) | `*T`, `&`, dereferencing, pointer receivers, no pointer arithmetic |
+| 16 | [Interfaces](16-interfaces.md) | Method sets, implicit satisfaction, type assertion, type switch, `any` |
 | 18 | [Type Definitions and Aliases](18-type-definitions-and-aliases.md) | `type Name BaseType` vs `type Alias = BaseType`, adding methods to primitives |
 
 ### Testing

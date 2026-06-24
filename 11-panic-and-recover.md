@@ -1,4 +1,4 @@
-# 13 — Panic and Recover
+# 11 — Panic and Recover
 
 Panic stops normal execution and begins unwinding the stack. Recover catches a panic inside a deferred function and restores normal execution. These are for truly unexpected conditions, not for normal error handling.
 

@@ -1,4 +1,4 @@
-# 10 — Control Flow
+# 09 — Control Flow
 
 Go provides conditionals, loops, and switches with minimal syntax. There are no parentheses around conditions, and braces are mandatory.
 
