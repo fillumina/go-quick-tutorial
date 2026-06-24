@@ -178,7 +178,26 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 07 — Operators
+### 07 — Blank Identifier
+
+**Scope:** The underscore `_` as a special identifier that discards values.
+
+**Cover:**
+
+- `_` is a predeclared identifier that discards assigned values
+- Used in multiple assignment: `value, _ := func()` to ignore the second return value
+- Used in range loops: `for _, value := range slice` to ignore the index
+- Used in imports: `import _ "package"` for side effects only
+- Used in type assertions: `_, ok := value.(Type)` to check type without extracting the value
+- Cannot be read from — it is a write-only variable; multiple assignments to `_` in the same scope do not conflict
+
+**Exclude:** nothing — the concept is narrow
+
+**Notes:** The blank identifier appears constantly in real Go code. Show a compact example of each usage pattern. A hint that `_` in the same scope always refers to the discard slot, not to a variable, prevents confusion for developers coming from languages where `_` is a conventional variable name.
+
+---
+
+### 08 — Operators
 
 **Scope:** Go's operators for arithmetic, comparison, logic, bitwise operations, and assignment.
 
@@ -195,25 +214,6 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Exclude:** operator overloading (not supported in Go)
 
 **Notes:** The `++` and `--` being statements rather than expressions is a frequent source of porting bugs — show that `x = i++` is a compile error. The `&^` (bit clear) operator is unique to Go — worth a brief example. The `%` operator's sign behavior (matches the dividend, not the divisor) differs from some languages — a hint here prevents a real misunderstanding.
-
----
-
-### 08 — Blank Identifier
-
-**Scope:** The underscore `_` as a special identifier that discards values.
-
-**Cover:**
-
-- `_` is a predeclared identifier that discards assigned values
-- Used in multiple assignment: `value, _ := func()` to ignore the second return value
-- Used in range loops: `for _, value := range slice` to ignore the index
-- Used in imports: `import _ "package"` for side effects only
-- Used in type assertions: `_, ok := value.(Type)` to check type without extracting the value
-- Cannot be read from — it is a write-only variable; multiple assignments to `_` in the same scope do not conflict
-
-**Exclude:** nothing — the concept is narrow
-
-**Notes:** The blank identifier appears constantly in real Go code. Show a compact example of each usage pattern. A hint that `_` in the same scope always refers to the discard slot, not to a variable, prevents confusion for developers coming from languages where `_` is a conventional variable name.
 
 ---
 

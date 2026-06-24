@@ -1,4 +1,4 @@
-# 09 — Blank Identifier
+# 07 — Blank Identifier
 
 The underscore `_` is a predeclared identifier that discards values. It is a write-only variable — you can assign to it but cannot read from it.
 

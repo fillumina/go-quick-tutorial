@@ -27,8 +27,8 @@ Each chapter covers exactly one concept, builds on the previous ones, and moves 
 |---|-------|--------|
 | 05 | [Variables and Types](05-variables-and-types.md) | `var`, `:=`, zero values, full numeric type inventory, explicit conversions |
 | 06 | [Constants](06-constants.md) | Typed vs untyped constants, `iota`, enumerated types, bitmask flags |
-| 07 | [Operators](07-operators.md) | Arithmetic, comparison, logic, bitwise, assignment; `++` as a statement |
-| 08 | [Blank Identifier](08-blank-identifier.md) | Discarding values with `_` across assignments, ranges, imports, type assertions |
+| 07 | [Blank Identifier](07-blank-identifier.md) | Discarding values with `_` across assignments, ranges, imports, type assertions |
+| 08 | [Operators](08-operators.md) | Arithmetic, comparison, logic, bitwise, assignment; `++` as a statement |
 
 ### Control Flow
 
