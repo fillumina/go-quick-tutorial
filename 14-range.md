@@ -37,7 +37,7 @@ for i, score := range scores {
 fmt.Println(scores)  // [1 2 3], unchanged
 ```
 
-To mutate elements, use the index:
+To mutate elements, use the index. Omit the value variable to get only the index:
 
 ```go
 for i := range scores {
@@ -62,15 +62,21 @@ for name, age := range ages {
 Range over a string yields runes (Unicode code points), not bytes. The index is the byte offset, not the rune position:
 
 ```go
-for i, r := range "cafe\u0301" {
-    fmt.Printf("%d %c\n", i, r)
-    // 0 c
-    // 1 a
-    // 2 f
-    // 3 e
-    // 4 ́   (combining accent, 3 bytes in UTF-8)
+for i, r := range "caf\u00e9 del mar" {
+    fmt.Printf("%d %q\n", i, r)
+    // 0 'c'
+    // 1 'a'
+    // 2 'f'
+    // 3 'é'    (2 bytes in UTF-8)
+    // 5 ' '    — byte offset jumped from 3 to 5
+    // 6 'd'
+    // 7 'e'
+    // 8 'l'
+    // ...
 }
 ```
+
+The precomposed é (U+00E9) occupies 2 bytes. After it, every subsequent byte offset is shifted by 1 compared to the rune position.
 
 If the string contains invalid UTF-8, range substitutes the bad byte with the Unicode replacement character `U+FFFD` and continues — it does not panic:
 
