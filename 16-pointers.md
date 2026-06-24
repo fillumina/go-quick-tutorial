@@ -68,6 +68,26 @@ fmt.Println(count)  // 6
 
 Use value passing when the function does not need to modify the argument. Use pointer passing when modification is needed or when copying the value is expensive (e.g., large structs).
 
+## Automatic Pointer Dereference for Field Access
+
+When you have a pointer to a struct, Go automatically dereferences it for field access. There is no `->` operator — the dot syntax works for both values and pointers:
+
+```go
+type Person struct {
+    Name string
+    Age  int
+}
+
+person := Person{Name: "Alice", Age: 30}
+fmt.Println(person.Name)    // Alice — value access
+
+ptr := &person
+fmt.Println((*ptr).Name)    // Alice — explicit dereference
+fmt.Println(ptr.Name)       // Alice — equivalent, automatic dereference
+```
+
+The explicit dereference `(*ptr).Name` is valid but unnecessary — `ptr.Name` is the idiomatic form.
+
 ## Pointer Receivers
 
 A method with a pointer receiver can mutate the struct and avoids copying it:
@@ -82,7 +102,7 @@ func (c *Counter) Increment() {
 }
 
 counter := Counter{count: 0}
-counter.Increment()   // Go automatically takes address: &counter.Increment()
+counter.Increment()   // Go automatically takes the address: (&counter).Increment()
 ```
 
 Go handles the address-taking automatically when calling a pointer method on a value. The reverse is also true — calling a value method on a pointer automatically dereferences:
@@ -103,16 +123,8 @@ fmt.Println(ptr.Value())  // 5, Go automatically dereferences
 Structs are value types — assigning or passing a struct copies all fields. Use `&` to get a pointer to a struct:
 
 ```go
-type Person struct {
-    Name string
-    Age  int
-}
-
 p := &Person{Name: "Alice", Age: 30}
-fmt.Println(p.Name)  // Alice
 ```
-
-Field access syntax is identical for values and pointers. Go automatically dereferences the pointer — there is no `->` operator.
 
 ### Slices and Maps
 
