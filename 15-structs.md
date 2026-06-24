@@ -69,7 +69,7 @@ fmt.Println(p.Greet())  // Hi, I'm Alice
 
 ### Receivers
 
-A method uses a type as its receiver. A value receiver (`func (p Person)`) gets a copy; a pointer receiver (`func (p *Person)`) gets the address and can modify the original. The full explanation of value vs pointer receivers, including when to use each, is covered in document 16.
+A method uses a type as its receiver. A value receiver (`(p Person)`) gets a copy; a pointer receiver (`(p *Person)`) gets the address and can modify the original. The full explanation of value vs pointer receivers, including when to use each, is covered in document 16.
 
 ## Struct Embedding
 
