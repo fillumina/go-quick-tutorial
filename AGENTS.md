@@ -13,29 +13,36 @@ The reader already knows how to program. They understand types, memory, concurre
 These apply to every document generated from this plan. The generating model must hold these throughout without drift.
 
 1. **State the problem before the solution.** Every concept starts with one sentence explaining what it solves or why it exists.
-2. **No forward references.** A concept may only assume knowledge of concepts introduced in earlier documents.
+2. **Avoid forward references when possible.** A chapter should prefer referencing concepts, syntax, and features introduced in the current or previous chapters. Do not use syntax the reader has not yet seen (e.g., `for..range`, slice notation `[]Type`, struct literals) in examples or explanations if you can avoid it. If a concept requires something not yet covered, describe it factually without code, or defer the example to the appropriate chapter. Sometimes a forward reference is inevitable — an experienced developer will not object to seeing `[]string` before slices are formally introduced. Use judgment.
 
-**Acceptable exceptions to principle 2:**
-- Document 16 mentions struct tags are "read via reflection" before reflection is covered in document 26 — the reference is incidental (the reader doesn't need to understand reflection to use struct tags) and avoids a circular dependency (reflection examples naturally use struct tags).
+**Known exceptions (listed to avoid re-proposing them at each review, not exhaustive):**
+
+- Document 15 mentions struct tags are "read via reflection" before reflection is covered in document 26 — the reference is incidental (the reader doesn't need to understand reflection to use struct tags) and avoids a circular dependency (reflection examples naturally use struct tags).
 - Document 18 (Type Definitions and Aliases) references `byte`/`rune` as aliases first introduced in document 05 without foreshadowing — the cross-reference is backward, not forward, and serves as clarification rather than a dependency.
+
+Other forward references are acceptable when inevitable. Use judgment — an experienced developer won't object to seeing a concept before it's formally introduced.
+
 3. **One concept per document, unless they naturally belong together.** Related ideas that reinforce each other can share a document. Do not cram unrelated topics together.
 4. **Be complete on fundamentals, selective on advanced topics.** Basic inventories — all types, all declaration forms, all loop variants — must be exhaustive. Omitting `int32` or `uint16` from a type list forces the reader elsewhere for something elementary. Selectivity applies to advanced and rarely-used features, not to the basic building blocks of the language.
 5. **Examples are focused and purposeful.** Multiple small examples are better than one overloaded example. Each example illustrates exactly one thing. Use descriptive variable names, but single letters are fine in short, self-explanatory functions (e.g. `func add(x, y int)`). No contrived complexity. Keep examples concise — use judgment, do not exceed what is needed to illustrate the point.
-6. **Omit edge cases unless they affect common usage.** If a gotcha only surfaces in unusual code, skip it.
+6. **Lead with the common case, put edge cases in asides.** Explain the main, typical behavior first. Nuances and corner cases belong in a brief aside or at the end of the explanation — not omitted, just de-prioritized. The goal is a smooth learning curve, not an artificially simplified language.
 7. **No history, no trivia, no philosophy.** Not why Go was designed this way. Not how it compares to other languages. Just what it is and how it works.
 8. **No workarounds presented as wisdom.** If a pattern exists to compensate for a language limitation, say so plainly or skip it.
-9. **Tone is neutral and technical.** No enthusiasm. No apology. No padding.
+9. **Tone is direct and practical.** No enthusiasm, no apology, no padding. But also not sterile — use natural language and concrete context. The goal is clarity, not clinical detachment.
 10. **Hints are allowed when they prevent a real misunderstanding.** A hint is a short clarifying note that stops the reader from drawing a wrong conclusion. It is not an opinion, a recommendation, or a best practice. If a hint would read as advice rather than clarification, omit it.
+11. **Be complete and descriptive.** Do not compress explanations to the point where important details are lost. Each concept should be explained thoroughly enough that the reader can use it without needing to consult another source. When in doubt, include more detail rather than less.
+12. **Structure for browsing, not reading.** Use clear section headings, bold for key terms and syntax, and italics for emphasis. Make the structure scannable — a reader should be able to find what they need in seconds, not by reading linearly. Lists are good for memorization; prose is better for detailed descriptions. Use judgment to balance conciseness with exhaustiveness. Use formatting to create visual hierarchy and make the content mnemonic.
 
 ---
 
 ## Style Reference
 
 Inspired by:
+
 - **Go Tour** (go.dev/tour): each page covers exactly one idea, minimal prose, code immediately illustrates the point
 - **W3Schools Go**: flat structure, one topic per page, definition first then syntax then minimal example
 
-Target density: each document should be readable in 3–5 minutes. Longer means scope creep.
+Target density: each document should be around 1000 words. Longer is acceptable when the topic requires it — do not compress explanations to the point where details are lost. If a document exceeds ~2000 words, consider splitting it into two parts.
 
 ---
 
@@ -50,6 +57,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How a Go program is organized at the file and package level.
 
 **Cover:**
+
 - Every Go file belongs to a package declared at the top
 - `package main` with a `main()` function is the entry point for executables
 - Multiple files in the same directory share a package — they are compiled together
@@ -68,6 +76,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go imports packages and controls naming.
 
 **Cover:**
+
 - `import "path/to/package"` — single import
 - Grouped import block: `import ( "fmt" \n "os" )` — preferred form
 - The imported name is the last path element by default: `"net/http"` is used as `http`
@@ -87,6 +96,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go organizes code into packages, manages dependencies, and provides build tooling.
 
 **Cover:**
+
 - A package is a directory of `.go` files sharing the same `package` declaration
 - Package naming convention: short, lowercase, no underscores, matches directory name
 - A module is a collection of packages with a single `go.mod` file at the root
@@ -112,6 +122,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** What the Go standard library provides and how to navigate documentation.
 
 **Cover:**
+
 - The standard library is extensive and covers: I/O (`io`, `os`, `bufio`), networking (`net/http`, `net`), encoding (`encoding/json`, `encoding/xml`), string manipulation (`strings`, `strconv`, `unicode`), concurrency primitives (`sync`, `atomic`), time (`time`), file paths (`path/filepath`), testing (`testing`), formatting (`fmt`), and more
 - `go doc packagename` prints documentation for a package in the terminal
 - `go doc packagename.FunctionName` prints documentation for a specific symbol
@@ -130,6 +141,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go declares variables and what basic types exist.
 
 **Cover:**
+
 - `var name type = value` — explicit declaration
 - `:=` — short declaration, type inferred, only inside functions
 - Go is statically typed; types cannot change after declaration
@@ -150,6 +162,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go declares constants, the distinction between typed and untyped constants, and how iota enables enumerated types.
 
 **Cover:**
+
 - `const name = value` — compile-time constant; value must be determinable at compile time
 - `const name type = value` — typed constant; type is fixed and enforced at assignment
 - Untyped constants carry a kind (integer, float, string, bool, rune) and adapt to context — `const Pi = 3.14159` can be assigned to any float type without explicit conversion
@@ -165,29 +178,12 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 07 — Pointers
-
-**Scope:** How pointers work in Go.
-
-**Cover:**
-- `*T` is a pointer to a value of type T
-- `&variable` takes the address of a variable
-- `*pointer` dereferences — reads or writes the value at the address
-- Go has no pointer arithmetic
-- Passing a pointer allows a function to modify the caller's variable
-- Use a pointer receiver when a method needs to mutate the struct or when the struct is large
-
-**Exclude:** unsafe.Pointer (covered in document 27), stack vs heap allocation, escape analysis
-
-**Notes:** Show value-passing vs pointer-passing as two side-by-side examples — this is the clearest way to make the distinction concrete. The no-pointer-arithmetic fact is a one-line hint for C developers. A hint that Go decides stack vs heap allocation automatically (the programmer does not control this) prevents confusion for C/C++ developers.
-
----
-
-### 08 — Operators
+### 07 — Operators
 
 **Scope:** Go's operators for arithmetic, comparison, logic, bitwise operations, and assignment.
 
 **Cover:**
+
 - Arithmetic: `+`, `-`, `*`, `/` (integer division truncates toward zero), `%` (remainder, sign matches dividend)
 - Increment and decrement: `i++`, `i--` — statements only, not expressions; cannot use as a value
 - Comparison: `==`, `!=`, `<`, `<=`, `>`, `>=` — structs and arrays are comparable field-by-field; slices, maps, and functions are not
@@ -202,11 +198,12 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 09 — Blank Identifier
+### 08 — Blank Identifier
 
 **Scope:** The underscore `_` as a special identifier that discards values.
 
 **Cover:**
+
 - `_` is a predeclared identifier that discards assigned values
 - Used in multiple assignment: `value, _ := func()` to ignore the second return value
 - Used in range loops: `for _, value := range slice` to ignore the index
@@ -220,11 +217,12 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 10 — Control Flow
+### 09 — Control Flow
 
 **Scope:** Conditionals, loops, and switches in Go.
 
 **Cover:**
+
 - `if condition { }` — no parentheses around condition; braces are mandatory
 - `if init; condition { }` — init statement in if; the init variable is scoped to the if block
 - `for` is the only loop construct: `for i := 0; i < n; i++ { }`, `for condition { }` (while equivalent), `for { }` (infinite)
@@ -240,11 +238,12 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 11 — Functions
+### 10 — Functions
 
 **Scope:** How functions are declared and called in Go.
 
 **Cover:**
+
 - `func name(param type) returnType { }` — basic signature
 - Multiple return values: `func divide(a, b float64) (float64, error)` — idiomatic Go
 - Named return values: declared in the signature, returned by a bare `return` — mention briefly, not encouraged for clarity
@@ -261,11 +260,12 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 12 — Error Handling
+### 11 — Error Handling
 
 **Scope:** How Go signals and handles errors.
 
 **Cover:**
+
 - `error` is a built-in interface with a single method: `Error() string`
 - The convention: functions return `(result, error)` as the last value
 - The pattern: `result, err := doSomething(); if err != nil { handle }`
@@ -282,11 +282,12 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 13 — Panic and Recover
+### 12 — Panic and Recover
 
 **Scope:** How Go handles abnormal termination and controlled recovery from runtime failures.
 
 **Cover:**
+
 - `panic(value)` stops normal execution and begins unwinding the stack, running deferred functions along the way
 - `recover()` inside a deferred function catches a panic and restores normal execution
 - Without `recover`, a panic propagates up the call stack and terminates the program with a stack trace
@@ -300,11 +301,12 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 14 — Arrays and Slices
+### 13 — Arrays and Slices
 
 **Scope:** Go's two sequence types and how they relate.
 
 **Cover:**
+
 - Array: fixed size, value type — `[3]int{1, 2, 3}`. Size is part of the type; `[3]int` and `[4]int` are different types.
 - Slice: variable-length view over an underlying array — `[]int{1, 2, 3}`. The everyday sequence type.
 - `make([]int, length, capacity)` creates a slice with explicit sizing
@@ -320,11 +322,12 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 15 — Maps
+### 14 — Maps
 
 **Scope:** Go's built-in key-value type.
 
 **Cover:**
+
 - `map[KeyType]ValueType` — type syntax
 - `make(map[string]int)` — creates a usable map; a nil map (var m map[string]int) panics on write
 - `m[key] = value` — set
@@ -339,24 +342,45 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 
 ---
 
-### 16 — Structs
+### 15 — Structs
 
 **Scope:** Go's composite type for grouping named fields.
 
 **Cover:**
+
 - `type Name struct { Field Type }` — definition
 - Anonymous structs: `struct { Name string; Age int }` — used for ad-hoc data, JSON payloads, and test fixtures
 - Initialization with named fields: `Name{Field: value}` — preferred; positional also works
 - Field access: `instance.Field`
-- Pointer to struct: `&Name{...}` — field access is identical: `p.Field` (Go dereferences automatically)
 - Methods: `func (receiver TypeName) MethodName() ReturnType { }` — a function bound to a type
-- Value receiver vs pointer receiver: pointer receiver can mutate the struct and avoids copying; use consistently across a type's methods
+- Value receiver: receives a copy of the struct; cannot mutate the original
 - Struct embedding: a type included without a field name — its fields and methods are promoted to the outer struct
 - Struct tags: metadata attached to fields as backtick-delimited strings, read via reflection — `Field Type `json:"name,omitempty"``; common tags include `json`, `xml`, `yaml`, `db`; multiple key-value pairs are space-separated within a tag
 
 **Exclude:** promoted field conflicts, exhaustive tag reference
 
-**Notes:** Embedding is Go's primary composition mechanism — show a concrete example where an embedded type's method is called directly on the outer struct. Show struct tags with a complete example: a struct with `json` tags, then a brief note that `encoding/json` reads them via reflection to control serialization. The `omitempty` option is the most commonly used tag option — show it. The automatic pointer dereference for field access is worth a hint for C developers who expect `->`.
+**Notes:** Embedding is Go's primary composition mechanism — show a concrete example where an embedded type's method is called directly on the outer struct. Show struct tags with a complete example: a struct with `json` tags, then a brief note that `encoding/json` reads them via reflection to control serialization. The `omitempty` option is the most commonly used tag option — show it.
+
+---
+
+### 16 — Pointers
+
+**Scope:** How pointers work in Go and how they enable mutation and receiver semantics.
+
+**Cover:**
+
+- `*T` is a pointer to a value of type T
+- `&variable` takes the address of a variable
+- `*pointer` dereferences — reads or writes the value at the address
+- Go has no pointer arithmetic
+- Passing a pointer allows a function to modify the caller's variable
+- Pointer to struct: `&Name{...}` — field access is identical: `p.Field` (Go dereferences automatically)
+- Pointer receiver: `func (r *TypeName) MethodName()` — can mutate the receiver; preferred for large structs to avoid copying
+- Value receiver vs pointer receiver: use consistently across a type's methods; mixing them breaks interface satisfaction
+
+**Exclude:** unsafe.Pointer (covered in document 28), stack vs heap allocation, escape analysis
+
+**Notes:** Show value-passing vs pointer-passing as two side-by-side examples — this is the clearest way to make the distinction concrete. The no-pointer-arithmetic fact is a one-line hint for C developers. A hint that Go decides stack vs heap allocation automatically (the programmer does not control this) prevents confusion for C/C++ developers. Show a pointer receiver method that mutates a struct, contrasted with a value receiver that cannot. The automatic pointer dereference for field access (`p.Field` instead of `p->Field`) is worth a hint for C developers.
 
 ---
 
@@ -365,6 +389,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** Go's mechanism for defining behavior independent of concrete types.
 
 **Cover:**
+
 - An interface is a set of method signatures: `type Stringer interface { String() string }`
 - Interface embedding: one interface can include another — `type ReadWriter interface { Reader; Writer }` combines their method sets
 - Any type that implements all methods satisfies the interface — no declaration, no `implements` keyword
@@ -386,6 +411,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go creates named types from existing types, and how type aliases differ.
 
 **Cover:**
+
 - `type Name BaseType` creates a new distinct type based on an existing type
 - A new type has no methods inherited from the base type — they must be defined separately
 - `type Alias = BaseType` creates a type alias — completely interchangeable with the base type in all contexts
@@ -404,6 +430,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go's built-in testing works.
 
 **Cover:**
+
 - Test files end in `_test.go` — excluded from normal builds automatically
 - Test functions: `func TestName(t *testing.T)` — must start with `Test`
 - `go test ./...` runs all tests in the module
@@ -426,6 +453,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** Go's lightweight concurrency primitive.
 
 **Cover:**
+
 - `go functionCall()` launches a goroutine — the function runs concurrently with the caller
 - Goroutines are multiplexed onto OS threads by the Go runtime — not OS threads themselves
 - The main goroutine exiting terminates the program immediately, regardless of running goroutines
@@ -444,6 +472,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** Go's mechanism for passing values between goroutines.
 
 **Cover:**
+
 - `chan T` is a channel that carries values of type T; `chan<- T` is send-only, `<-chan T` is receive-only — used in function signatures to enforce direction
 - `make(chan int)` creates an unbuffered channel; `make(chan int, n)` creates a buffered channel
 - `ch <- value` sends; `value := <-ch` receives
@@ -465,6 +494,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go propagates cancellation and deadlines across function call chains.
 
 **Cover:**
+
 - The problem: when a chain of functions performs I/O or blocks, the caller needs a way to cancel the entire chain — context is that mechanism
 - `context.Context` is an interface; it is passed as the first argument to any function that may block or do I/O
 - `context.Background()` is the root context — used at the entry point of a request or program
@@ -485,13 +515,14 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How defer combines with error handling and context for resource cleanup.
 
 **Cover:**
+
 - The canonical resource pattern: open, check error, defer close — in that exact order
 - `defer cancel()` placed immediately after `context.WithCancel` or `context.WithTimeout`
 - Early return on error is idiomatic — flat code without nesting is preferred over deeply nested error checks
 
-**Exclude:** panic/recover, named return values with defer, defer basics (covered in document 11)
+**Exclude:** panic/recover, named return values with defer, defer basics (covered in document 10)
 
-**Notes:** This document consolidates patterns from functions (11), errors (12), and context (22) — it should feel like recognition, not new syntax. Show the open/check/defer pattern as a complete realistic example.
+**Notes:** This document consolidates patterns from functions (10), errors (11), and context (22) — it should feel like recognition, not new syntax. Show the open/check/defer pattern as a complete realistic example.
 
 ---
 
@@ -500,6 +531,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** Go's non-channel concurrency primitives for mutual exclusion and coordination.
 
 **Cover:**
+
 - `sync.Mutex` — mutual exclusion lock; `Lock()` acquires, `Unlock()` releases; not reentrant
 - `sync.RWMutex` — read-write lock; `RLock()`/`RUnlock()` for concurrent readers, `Lock()`/`Unlock()` for exclusive writers
 - `sync.WaitGroup` — wait for a collection of goroutines to finish; `Add(n)` sets count, `Done()` decrements, `Wait()` blocks until zero
@@ -519,6 +551,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go runs initialization code before `main()`.
 
 **Cover:**
+
 - `func init() { }` runs automatically before `main()`; no parameters, no return values
 - Each package may have multiple `init` functions across its files; all run at startup
 - Execution order: dependencies first (in import order), then the importing package
@@ -536,6 +569,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** How Go programs can inspect and manipulate values and types at runtime.
 
 **Cover:**
+
 - The `reflect` package provides runtime type inspection
 - `reflect.TypeOf(value)` returns the dynamic type of a value as a `reflect.Type`
 - `reflect.ValueOf(value)` returns a `reflect.Value` that can be inspected and manipulated
@@ -555,6 +589,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** What the `unsafe` package does and what its presence in code means.
 
 **Cover:**
+
 - `unsafe` is a built-in package that bypasses Go's type system and memory safety guarantees
 - `unsafe.Pointer` converts between pointer types that would otherwise be incompatible
 - `unsafe.Sizeof(x)` returns the memory size of a value in bytes
@@ -573,6 +608,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** Go's type parameter system introduced in Go 1.18.
 
 **Cover:**
+
 - Type parameters allow writing functions and types that work with multiple types without losing type safety
 - Function syntax: `func Map[T, U any](slice []T, transform func(T) U) []U`
 - Type parameters are listed in square brackets before the function parameters
@@ -593,6 +629,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 **Scope:** Corner cases and subtle behaviors that trip up experienced developers.
 
 **Cover:**
+
 - `time.Duration` is just `int64` nanoseconds — arithmetic works, but the type prevents mixing with plain integers
 - `strings.Builder` and `bytes.Buffer` are not concurrency-safe — do not share across goroutines
 - `append` can mutate the backing array of another slice if the destination has spare capacity — a sub-slice appended to may silently alter the original
@@ -605,7 +642,7 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - `fmt.Sprintf("%s", someBytes)` works, but `fmt.Sprintf("%s", someString)` and `fmt.Sprintf("%s", someBytes)` are not interchangeable with `%v` — `%v` adds brackets to slices
 - A struct with any uncomparable field (slice, map, function) cannot be used as a map key or compared with `==`
 - `defer` with a closure that captures loop variables sees the final value of those variables in Go < 1.22; Go 1.22+ captures per-iteration, but older code still exists
-- Predeclared identifiers are not true keywords — they are defined in the universe block and can be shadowed by local declarations. The shadowable identifiers are: `true`, `false`, `nil` (constants); `bool`, `byte`, `complex64`, `complex128`, `error`, `float32`, `float64`, `int`, `int8`, `int16`, `int32`, `int64`, `rune`, `string`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr` (types); `append`, `cap`, `close`, `complex`, `copy`, `delete`, `imag`, `len`, `make`, `new`, `panic`, `real`, `recover` (functions). Shadowing `true`, `false`, or `nil` is flagged by `go vet`; shadowing the rest is not.
+- Predeclared identifiers are not true keywords — they can be shadowed by local declarations. The shadowable identifiers: `true`, `false`, `nil` (constants); `bool`, `byte`, `complex64`, `complex128`, `error`, `float32`, `float64`, `int`, `int8`, `int16`, `int32`, `int64`, `rune`, `string`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr` (types); `append`, `cap`, `close`, `complex`, `copy`, `delete`, `imag`, `len`, `make`, `new`, `panic`, `real`, `recover` (functions). Shadowing `true`, `false`, or `nil` is flagged by `go vet`; shadowing the rest is not.
 - A nil pointer assigned to an interface is NOT nil — the interface holds a type, so `var i interface{} = (*T)(nil); i != nil` is true. This is a frequent source of bugs when returning errors as interfaces.
 
 **Exclude:** version-specific behavior beyond the Go 1.22 loop variable change, cgo gotchas, race detector internals
@@ -628,7 +665,7 @@ Scope: [SCOPE LINE]
 
 Rules you must follow without exception:
 - Start with one sentence stating what problem this feature solves or why it exists
-- Cover only what is listed under "Cover" — nothing more
+- Cover everything listed under both "Cover" and "Notes" — the Notes section refines and clarifies the Cover requirements, it is not optional
 - Do not mention anything listed under "Exclude"
 - Use multiple small focused examples — each illustrates exactly one thing
 - Each example should be concise; use descriptive variable names, but single letters are fine in short, self-explanatory functions
