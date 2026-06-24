@@ -1,6 +1,6 @@
 # 13 — Maps
 
-A map is Go's built-in key-value type. Keys must be comparable (support `==`). Values can be any type.
+A map is Go's built-in key-value type. Keys must be comparable (support `==`) — see the Comparable Keys section below. Values can be any type.
 
 ## Declaration and Creation
 
@@ -90,14 +90,99 @@ func replaceScores(m map[string]int) {
 
 ## Comparable Keys
 
-Map keys must support `==`. Valid key types include:
+Map keys must be **comparable** — a compile-time type property meaning the type supports `==` and `!=`. This is not a runtime check; the compiler rejects a map declaration if the key type is not comparable.
 
-- Integers: `int`, `int64`, `uint`, etc.
+### Primitive Comparable Types
+
+These built-in types are comparable:
+
+- Integers: `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr`
 - Floats: `float32`, `float64`
 - Strings
 - Booleans
-- Pointers
-- Arrays
-- Structs (if all fields are comparable)
+- Pointers (of any type)
+- `complex64`, `complex128`
 
-Invalid key types: slices, maps, functions — they do not support `==`.
+### Composite Comparable Types
+
+Structs and arrays are comparable **recursively** — the type is comparable only if every component is comparable:
+
+```go
+type Config struct {
+    Host string
+    Port int
+}
+
+// OK — all fields are comparable
+m := map[Config]bool{
+    {Host: "localhost", Port: 8080}: true,
+}
+```
+
+An array is comparable if its element type is comparable:
+
+```go
+// OK — [3]int is comparable because int is comparable
+m := map[[3]int]string{
+    {1, 2, 3}: "triple",
+}
+```
+
+Nested structs follow the same rule — every field at every level must be comparable:
+
+```go
+type Address struct {
+    Street string
+    City   string
+}
+
+type Person struct {
+    Name    string
+    Address Address  // OK — Address is comparable (all fields are strings)
+}
+
+// OK — Person is comparable
+m := map[Person]int{}
+```
+
+### Non-Comparable Types
+
+Slices, maps, and functions are **never** comparable. They are reference types — two variables may point to different underlying data with the same contents, and there is no defined semantics for value equality:
+
+```go
+map[[]int]string{}    // compile error: []int is not comparable
+map[map[int]string]string{} // compile error: map[int]string is not comparable
+map[func()]string{}   // compile error: func() is not comparable
+```
+
+### Recursive Non-Comparability
+
+A struct containing any non-comparable field is itself non-comparable, even if all other fields are comparable:
+
+```go
+type BadKey struct {
+    ID   int
+    Tags []string  // slice makes the entire struct non-comparable
+}
+
+map[BadKey]int{}  // compile error: BadKey is not comparable
+```
+
+This rule applies at any nesting depth. A struct that contains another struct that contains a slice is also non-comparable.
+
+### Workaround: Use a Comparable Surrogate
+
+When you need to index by a struct with non-comparable fields, derive a comparable key:
+
+```go
+type Item struct {
+    ID   int
+    Tags []string
+}
+
+// Use the ID as the map key instead
+items := map[int]*Item{}
+items[item.ID] = &item
+```
+
+Or use a string representation of the fields you need to match on.

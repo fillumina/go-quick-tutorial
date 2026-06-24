@@ -12,6 +12,12 @@ arr = [3]int{1, 2, 3}    // [1 2 3]
 arr[0] = 10              // [10 2 3]
 ```
 
+You can also use index-keyed (sparse) literals to set specific positions, leaving the rest as zero values:
+
+```go
+arr := [5]int{2: 10, 4: 20}  // [0 0 10 0 20]
+```
+
 Arrays are value types. Assigning or passing an array copies all elements:
 
 ```go
