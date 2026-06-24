@@ -58,22 +58,67 @@ The typical workflow is: **add the import to your code**, then run `go mod tidy`
 3. Adds the dependency to `go.mod` with the minimum required version
 4. Updates `go.sum` with the cryptographic hash
 
-**You cannot specify a version with automatic download.** `go mod tidy` always picks the minimum version required by your code. If you need a specific version, use `go get` instead. The same automatic resolution happens when you run `go build` or `go run`.
+**Example — adding a GitHub dependency:**
 
-### Explicit Dependency Management with `go get`
+Add an import to your code:
 
-Use `go get` when you need explicit control over versions:
-
-```
-go get github.com/some/library@v1.4.2
+```go
+import "github.com/gorilla/mux"
 ```
 
-**Prefer `go get` when:**
+Run `go mod tidy`. Go resolves the module path, downloads the latest compatible version, and updates `go.mod`:
 
-- Pinning a specific version rather than accepting the minimum required
-- Upgrading a dependency beyond the version currently in `go.mod`
-- Downgrading a dependency to test compatibility
-- Adding a dependency before writing the import (e.g., scaffolding a project)
+```
+require github.com/gorilla/mux v1.8.1
+```
+
+The module is now cached locally and available for building. The same automatic resolution happens when you run `go build` or `go run` — they will download missing dependencies before compiling.
+
+**You cannot specify a version with automatic download.** `go mod tidy` always picks the minimum version required by your code. If you need a specific version, use `go get` instead.
+
+### Other Dependency Methods
+
+**`go get` — explicit version control:**
+
+```
+go get github.com/gorilla/mux@v1.8.1
+```
+
+Use `go get` when you need to pin a specific version, upgrade beyond the current minimum, or add a dependency before writing the import.
+
+**`go mod download` — download without modifying `go.mod`:**
+
+```
+go mod download
+```
+
+Downloads all dependencies listed in `go.mod` to the local cache without adding or removing entries. Useful for pre-populating the cache in CI pipelines or verifying that all dependencies are reachable.
+
+**`go mod vendor` — local vendor directory:**
+
+```
+go mod vendor
+```
+
+Copies all dependencies into a `vendor/` directory within your project. Subsequent builds use the vendored copies instead of downloading. Useful for air-gapped environments or when you want to lock the exact source code your project builds against.
+
+**`go mod why` — understand why a dependency is needed:**
+
+```
+go mod why github.com/uber/atomic
+```
+
+Prints the shortest import chain from your main module to the specified dependency, showing which of your packages transitively requires it.
+
+### Removing Dependencies
+
+`go mod tidy` removes unused dependencies automatically. To remove a specific one:
+
+```
+go get github.com/some/library@none
+```
+
+This removes the entry from `go.mod` entirely.
 
 ### Semver Versioning
 

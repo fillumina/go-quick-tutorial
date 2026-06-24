@@ -14,6 +14,10 @@ name := "Alice"            // short declaration, inside functions only
 
 The `var` form works at package level and inside functions. The `:=` short declaration works only inside functions — it is a compile error at package level.
 
+## Identifier Rules
+
+An identifier is a sequence of letters, digits, and underscores that does not start with a digit. Go accepts Unicode letters, but the convention is ASCII-only: use `a-z`, `A-Z`, `0-9`, and `_`. Non-ASCII identifiers compile but will mark your code as unusual and can cause tooling issues.
+
 Multiple variables in one statement:
 
 ```go
@@ -58,6 +62,32 @@ var ratio float64 = float64(count)  // explicit conversion
 
 var count int = 5
 ratio := float64(count)             // inferred as float64
+```
+
+## Numeric Literals
+
+Integers can be written in multiple bases:
+
+```go
+x := 42        // decimal (base 10)
+x := 0x2A      // hexadecimal (base 16)
+x := 0o52      // octal (base 8)
+x := 0b101010  // binary (base 2)
+```
+
+Underscores improve readability of long literals:
+
+```go
+x := 1_000_000
+mask := 0b1111_0000
+```
+
+Floating-point literals support exponential notation:
+
+```go
+x := 1.23e4   // 12300.0
+x := 1.23e-4  // 0.000123
+x := 123e2    // 12300.0
 ```
 
 ## Numeric Types
