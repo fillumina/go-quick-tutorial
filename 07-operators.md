@@ -112,14 +112,14 @@ x >>= 1   // x = x >> 1
 
 ## Precedence
 
-Operator precedence from highest to lowest:
+From highest to lowest (within each level, left-to-right):
 
-```
-x *     x /     x %     x <<    x >>    x &     x &^
-x +     x -     x |     x ^
-x ==    x !=    x <     x <=    x >     x >=
-x &&
-x ||
-```
+| Level | Operators | Description |
+|-------|-----------|-------------|
+| 1 | `*`  `/`  `%`  `<<`  `>>`  `&`  `&^` | Multiplicative, shift, bitwise AND, bit clear |
+| 2 | `+`  `-`  `\|`  `^` | Additive, bitwise OR, XOR |
+| 3 | `==`  `!=`  `<`  `<=`  `>`  `>=` | Comparison |
+| 4 | `&&` | Logical AND |
+| 5 | `\|\|` | Logical OR |
 
-Within each level, operators are left-to-right. Parentheses override precedence.
+Parentheses override precedence. Unary `!`, `&`, and `*` bind tighter than all binary operators.
