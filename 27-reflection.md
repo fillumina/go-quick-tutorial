@@ -1,4 +1,4 @@
-# 26 — Reflection
+# 27 — Reflection
 
 The `reflect` package provides runtime type inspection. It is used to examine struct fields and their tags, determine types at runtime, and manipulate values dynamically.
 

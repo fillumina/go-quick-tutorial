@@ -1,4 +1,4 @@
-# 20 — Goroutines
+# 21 — Goroutines
 
 A goroutine is Go's lightweight concurrency primitive. The `go` keyword launches a function to run concurrently with the caller.
 

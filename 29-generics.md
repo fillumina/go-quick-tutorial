@@ -1,4 +1,4 @@
-# 28 — Generics
+# 29 — Generics
 
 Type parameters allow writing functions and types that work with multiple types without losing type safety. Go added generics in version 1.18.
 

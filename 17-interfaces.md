@@ -1,4 +1,4 @@
-# 16 — Interfaces
+# 17 — Interfaces
 
 An interface defines a set of method signatures. Any type that implements all methods satisfies the interface — there is no declaration, no `implements` keyword, and no explicit relationship.
 

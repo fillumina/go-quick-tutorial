@@ -1,4 +1,4 @@
-# 22 — Context
+# 23 — Context
 
 When a chain of functions performs I/O or blocks, the caller needs a way to cancel the entire chain. `context.Context` is that mechanism — it propagates cancellation signals and deadlines across function call chains.
 

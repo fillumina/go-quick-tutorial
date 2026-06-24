@@ -1,4 +1,4 @@
-# 29 — Common Gotchas
+# 30 — Common Gotchas
 
 Corner cases and subtle behaviors that trip up experienced developers. Each entry describes the behavior, why it happens, and a minimal example.
 

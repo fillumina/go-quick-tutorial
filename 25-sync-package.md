@@ -1,4 +1,4 @@
-# 24 — Sync Package
+# 25 — Sync Package
 
 The `sync` package provides non-channel concurrency primitives for mutual exclusion and coordination. Channels communicate between goroutines; `sync` coordinates shared-memory access.
 

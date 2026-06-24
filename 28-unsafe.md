@@ -1,4 +1,4 @@
-# 27 — Unsafe
+# 28 — Unsafe
 
 The `unsafe` package bypasses Go's type system and memory safety guarantees. Its presence in application code is a red flag requiring scrutiny.
 

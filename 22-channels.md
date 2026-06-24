@@ -1,4 +1,4 @@
-# 21 — Channels
+# 22 — Channels
 
 Channels pass values between goroutines. They are the synchronization mechanism in Go's concurrency model.
 

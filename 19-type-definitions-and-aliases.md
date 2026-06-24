@@ -1,4 +1,4 @@
-# 18 — Type Definitions and Aliases
+# 19 — Type Definitions and Aliases
 
 Go creates named types from existing types with `type Name BaseType`. A type alias creates a synonym with `type Alias = BaseType`. The distinction is fundamental: a type definition creates a new type; an alias does not.
 

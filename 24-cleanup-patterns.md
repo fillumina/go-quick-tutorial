@@ -1,4 +1,4 @@
-# 23 — Cleanup Patterns
+# 24 — Cleanup Patterns
 
 Go's `defer` combines with error handling and context for resource cleanup. The patterns are consistent and appear throughout real code.
 

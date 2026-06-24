@@ -1,4 +1,4 @@
-# 14 — Structs
+# 15 — Structs
 
 A struct groups named fields into a composite type. Structs are Go's primary mechanism for organizing data, and they serve as the foundation for methods and embedding.
 

@@ -1,4 +1,4 @@
-# 15 — Pointers
+# 16 — Pointers
 
 Pointers allow functions to modify the caller's variables and avoid copying large values. Go pointers are restricted compared to C — there is no pointer arithmetic, and the runtime manages memory automatically.
 

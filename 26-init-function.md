@@ -1,4 +1,4 @@
-# 25 — Init Function
+# 26 — Init Function
 
 `func init()` runs automatically before `main()`. It has no parameters and no return values. Each package may have multiple `init` functions across its files; all run at startup.
 
