@@ -74,7 +74,7 @@ Extract the concrete type from an interface value:
 
 ```go
 var s Stringer = Circle{Radius: 5}
-c := s.(Circle)
+c := s.(Circle)        // c is of type Circle
 fmt.Println(c.Radius)  // 5
 ```
 
