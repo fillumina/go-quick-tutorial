@@ -103,6 +103,7 @@ func (c *Counter) Increment() {
 
 counter := Counter{count: 0}
 counter.Increment()   // Go automatically takes the address: (&counter).Increment()
+fmt.Println(counter.count)  // 1
 ```
 
 Go handles the address-taking automatically when calling a pointer method on a value. The reverse is also true — calling a value method on a pointer automatically dereferences:
@@ -128,7 +129,11 @@ p := &Person{Name: "Alice", Age: 30}
 
 ### Slices and Maps
 
-Slices and maps are reference types. They carry an internal pointer to their underlying data. Assigning or passing a slice or map shares that underlying data — no explicit pointer is needed:
+Slices and maps are special types that carry a pointer to data allocated on the heap. A slice pointer is called header and it contains, other than the pointer itself, extra fields (length and capacity). A map variable is simply a pointer to a heap-allocated map structure. In both cases, assigning or passing the variable *copies* the pointer (or the header), *not* the underlying data.
+
+For slices, the header fields can differ between copies pointing to the same array — one view might have length 3 and another length 5 over the same backing data. This is the basis of slice views. For maps, there is no such distinction: two variables pointing to the same map are fully equivalent, as they are just plain pointers.
+
+When a slice or map is passed to a function, the pointer is copied but the underlying data is shared. Modifying the data inside the function changes what the caller sees. For slices, modifying the header (e.g., via `append`) only affects the copy — the caller's header stays unchanged.
 
 ```go
 original := []int{1, 2, 3}
@@ -146,11 +151,11 @@ n["a"] = 99
 fmt.Println(m["a"])  // 99 — shared underlying map
 ```
 
-Because they are already reference types, taking a pointer to a slice or map (`*[]int`, `*map[string]int`) is rare. It is only needed when you need to reassign the variable itself (e.g., setting it to `nil` or replacing it with a different slice/map) from within a function.
+Because they already behave like pointers, taking a pointer to a slice or map (`*[]int`, `*map[string]int`) is rare. It is only needed when you need to reassign the variable itself (e.g., setting it to `nil` or replacing it with a different slice/map) from within a function.
 
 ## Memory Allocation
 
-Go decides automatically whether a variable lives on the stack or the heap. The programmer does not control this decision. There is no `new` operator equivalent to C's `malloc` — the `new` built-in allocates zeroed memory and returns a pointer, but it is rarely used in practice:
+Go decides automatically whether a variable lives on the stack or the heap. The programmer does not control this decision. There is no `new` operator equivalent to C's `malloc` — the `new` built-in allocates zeroed memory on the heap and returns a pointer, but it is rarely used in practice:
 
 ```go
 ptr := new(int)   // allocates zeroed int, returns *int
