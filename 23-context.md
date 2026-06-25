@@ -158,68 +158,68 @@ A master-worker pattern: the master creates a context with a timeout, a dispatch
 package main
 
 import (
-    "context"
-    "fmt"
-    "time"
+	"context"
+	"fmt"
+	"time"
 )
 
 // worker processes jobs from a channel, stopping if the context is cancelled.
 func worker(ctx context.Context, jobs <-chan int) (int, error) {
-    count := 0
-    for {
-        select {
-        case <-ctx.Done():
-            return count, ctx.Err()
-        case <-jobs:
-            count++
-        }
-    }
+	count := 0
+	for {
+		select {
+		case <-ctx.Done():
+			return count, ctx.Err()
+		case <-jobs:
+			count++
+		}
+	}
 }
 
 // dispatch sends jobs to the worker indefinitely, until the context fires.
 func dispatch(ctx context.Context, jobs chan<- int) (int, error) {
-    // Derive a context with a shorter timeout from the received one.
-    // This child is cancelled if the parent expires first, or after 250ms.
-    ctx, cancel := context.WithTimeout(ctx, 250*time.Millisecond)
-    defer cancel()
+	// Derive a context with a longer timeout from the received one.
+	// The parent expires at 250ms, so this 500ms deadline never fires.
+	ctx, cancel := context.WithTimeout(ctx, 500*time.Millisecond)
+	defer cancel()
 
-    count := 0
-    for {
-        select {
-        case <-ctx.Done():
-            return count, ctx.Err()
-        case jobs <- count:
-            count++
-        }
-    }
+	count := 0
+	for {
+		select {
+		case <-ctx.Done():
+			return count, ctx.Err()
+		case jobs <- count:
+			count++
+		}
+	}
 }
 
 func main() {
-    // Entry point: create context from Background().
-    ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
-    defer cancel()
+	// Entry point: create context from Background().
+	ctx, cancel := context.WithTimeout(context.Background(), 250*time.Millisecond)
+	defer cancel()
 
-    jobs := make(chan int)
-    go worker(ctx, jobs)
+	jobs := make(chan int)
+	go worker(ctx, jobs)
 
-    sent, sendErr := dispatch(ctx, jobs)
-    fmt.Printf("dispatch: sent %d jobs — %v\n", sent, sendErr)
+	sent, sendErr := dispatch(ctx, jobs)
+	fmt.Printf("dispatch: sent %d jobs — %v\n", sent, sendErr)
 }
 ```
 
 **Output** (exact job count varies by machine):
 
 ```
-dispatch: sent 2847563 jobs — context deadline exceeded
+dispatch: sent 1259919 jobs — context deadline exceeded
 ```
 
 **What happened:**
 
-1. `main` creates a context with a 500ms timeout from `Background()`.
-2. `dispatch` derives a tighter 250ms deadline from the received context, and runs an infinite loop sending jobs.
-3. After 250ms, the tighter context's deadline fires — `cancel()` is triggered internally, closing `ctx.Done()`, which `dispatch` catches in its `select` and returns.
-4. `main` prints the result and exits, taking the worker goroutine with it.
-5. The infinite loop in `dispatch` was stopped solely by the context — no counters, limits, or flags needed.
+1. `main` creates a context with a 250ms timeout from `Background()`.
+2. `dispatch` derives a 500ms deadline from the received context — but the parent's 250ms is tighter, so that's the one that wins.
+3. After 250ms, the parent timer fires and closes `ctx.Done()` automatically. Both the worker and dispatch see it at the same time — the worker because it uses the parent directly, dispatch because cancellation propagates down the tree to its derived context.
+4. Both `select` statements pick `ctx.Done()` and return. The last send never completed, so both counts match.
+5. The infinite loops were stopped solely by the context — no counters, limits, or flags needed.
 
 ## Context Value
 
