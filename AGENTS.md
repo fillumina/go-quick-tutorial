@@ -413,15 +413,16 @@ Each entry includes: title, one-line scope, what to cover, what to explicitly ex
 - The convention: functions return `(result, error)` as the last value
 - The pattern: `result, err := doSomething(); if err != nil { handle }`
 - `errors.New("message")` creates a simple error
+- Sentinel errors: `var ErrNotFound = errors.New("not found")` — package-level error values returned by functions and checked with `==` (or `errors.Is` for wrapped errors)
+- `Unwrap() error` — a method that returns the underlying error, enabling error chains; `errors.Is` and `errors.As` traverse the chain by calling `Unwrap` repeatedly until it returns `nil`
 - `fmt.Errorf("context: %w", err)` wraps an error with context — `%w` enables unwrapping
 - `errors.Is(err, target)` checks if an error anywhere in the chain matches a target value
 - `errors.As(err, &target)` extracts a specific error type from the chain — use when you need to access fields on a custom error type
-- Sentinel errors: `var ErrNotFound = errors.New("not found")` — package-level error values returned by functions and checked with `errors.Is`
 - Errors are values — no exceptions, no stack unwinding
 
 **Exclude:** nothing
 
-**Notes:** Keep the explanation factual. The `%w` wrapping pattern is important for real code — show wrapping and `errors.Is` unwrapping as two separate examples. A hint that wrapping adds context for humans while preserving the original error for programmatic checks clarifies why both exist.
+**Notes:** Keep the explanation factual. Introduce `Unwrap() error` before wrapping so the reader understands the chain mechanism. The `%w` wrapping pattern is important for real code — show wrapping and `errors.Is` unwrapping as two separate examples. A hint that wrapping adds context for humans while preserving the original error for programmatic checks clarifies why both exist.
 
 ---
 
