@@ -1,17 +1,78 @@
 # 22 — Channels
 
-Channels pass values between goroutines. They are the synchronization mechanism in Go's concurrency model.
+Accessing shared variables from multiple goroutines causes race conditions. Channels solve this by passing values between goroutines instead of sharing memory. They are the synchronization mechanism in Go's concurrency model.
 
 ## Declaration and Creation
 
-`chan T` is a channel that carries values of type `T`:
+`chan T` is a channel that carries values of type `T`. The zero value of a channel is `nil`:
+
+```go
+var ch chan int  // nil channel
+```
+
+A nil channel blocks on all operations — sends and receives hang forever. It is effectively a channel that can never complete an operation:
+
+```go
+var ch chan int  // nil
+
+go func() {
+    ch <- 42  // blocks forever
+}()
+
+<-ch  // blocks forever
+```
+
+`make()` creates a usable channel. It takes a type and an optional capacity:
 
 ```go
 ch := make(chan int)       // unbuffered channel
 ch := make(chan int, 10)   // buffered channel, capacity 10
 ```
 
-Directional channels enforce send-only or receive-only in function signatures:
+## Send and Receive
+
+Both send and receive use the `<-` operator. The difference is the position of the channel name: on the left for send, on the right for receive.
+
+Send puts a value into a channel. The value can be a variable, literal, or expression:
+
+```go
+ch <- 42         // channel on the left — send
+ch <- x + y
+ch <- compute()
+```
+
+Receive reads a value from a channel and assigns it to a variable:
+
+```go
+value := <-ch    // channel on the right — receive
+```
+
+Both operations block until the other side is ready. A send waits until a receiver is available to consume the value. A receive waits until a value is available to read.
+
+## Directional Channels
+
+`chan<- T` (send-only) and `<-chan T` (receive-only) are proper channel types that restrict a channel to either sending or receiving. They are compatible with the bidirectional type `chan T`, so a normal channel can be assigned to a send-only or receive-only variable. They can be used as variable types, struct fields, and anywhere a type is expected:
+
+```go
+var sendCh chan<- int   // send-only variable
+var recvCh <-chan int   // receive-only variable
+
+sendCh <- 42            // OK
+<-sendCh                // compile error
+
+<-recvCh                // OK
+recvCh <- 42            // compile error
+```
+
+A bidirectional channel (`chan T`) converts to either directional type. A directional channel cannot convert back:
+
+```go
+ch := make(chan int)
+var sendCh chan<- int = ch   // OK
+var recvCh <-chan int = ch   // OK
+```
+
+They are most commonly used in function signatures to restrict what a caller can do with a channel:
 
 ```go
 func producer(sendCh chan<- int) {  // send-only
@@ -23,13 +84,6 @@ func producer() <-chan int {        // returns receive-only
     go func() { ch <- 42 }()
     return ch
 }
-```
-
-## Send and Receive
-
-```go
-ch <- value    // send
-value := <-ch  // receive
 ```
 
 ## Unbuffered Channels
@@ -68,38 +122,32 @@ ch <- 3   // blocks, buffer is full
 
 ## Close
 
-`close(ch)` signals that no more values will be sent:
+`close(ch)` signals that no more values will be sent. A receive from a channel returns two values: the received value and a boolean `ok` that is `true` if the channel is open and `false` after the last buffered item has been consumed from a closed channel. This lets the receiver detect when the sender is done:
 
 ```go
 ch := make(chan int)
 
 go func() {
-    for i := 1; i <= 3; i++ {
-        ch <- i
-    }
+    ch <- 1
+    ch <- 2
+    ch <- 3
     close(ch)
 }()
 
-for value := range ch {
+for {
+    value, ok := <-ch
+    if !ok {
+        break  // channel closed, no more values
+    }
     fmt.Println(value)  // 1, 2, 3
-    // loop ends when channel is closed
 }
 ```
 
-Receiving from a closed channel returns the zero value with `ok = false`:
-
-```go
-value, ok := <-ch
-if !ok {
-    // channel is closed and drained
-}
-```
-
-Sending on a closed channel panics. Receiving from a closed channel does not.
+Sending on a closed channel panics. Receiving from a closed channel does not — it returns immediately, either with a buffered value or with the zero value and `ok = false`.
 
 ## Range over Channels
 
-`for..range` on a channel receives values until the channel is closed. It is the idiomatic way to consume all values from a channel:
+`for..range` on a channel receives values until the channel is closed. It is the idiomatic shorthand for the close-and-drain pattern shown above:
 
 ```go
 for value := range ch {
@@ -121,15 +169,15 @@ for range doneCh {
 
 ## Select
 
-`select` waits on multiple channel operations simultaneously:
+`select` waits on multiple channel send and receive operations simultaneously:
 
 ```go
 select {
-case msg := <-ch1:
+case msg := <-ch1:  // receive
     fmt.Println("from ch1:", msg)
-case msg := <-ch2:
+case msg := <-ch2:  // receive
     fmt.Println("from ch2:", msg)
-case ch3 <- 42:
+case ch3 <- 42:     // send
     fmt.Println("sent to ch3")
 }
 ```
