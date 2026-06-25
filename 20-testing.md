@@ -87,3 +87,83 @@ func FuzzReverse(f *testing.F) {
 ```
 
 Run with `go test -fuzz=FuzzReverse`. The framework generates random inputs and mutates them to find failures. Seed the fuzzer with known inputs using `f.Add("example")`.
+
+The fuzz function parameters can be any of these types: `bool`, `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr`, `float32`, `float64`, `string`, `[]byte`. You can use multiple parameters in a single fuzz function:
+
+```go
+func FuzzParse(f *testing.F) {
+    f.Fuzz(func(t *testing.T, s string, n int, flag bool) {
+        // fuzzer generates random values for all three parameters
+    })
+}
+```
+
+## t.Helper
+
+Mark a helper function with `t.Helper()` so that failure messages report the caller's location, not the helper's:
+
+```go
+func assertEqual(t *testing.T, got, want int) {
+    t.Helper()
+    if got != want {
+        t.Errorf("got %d, want %d", got, want)
+    }
+}
+
+func TestAdd(t *testing.T) {
+    assertEqual(t, Add(2, 3), 5)  // failure points here, not into assertEqual
+}
+```
+
+Without `t.Helper()`, a failing assertion reports the line inside the helper function, making it harder to trace which test case triggered the failure.
+
+## Mocking
+
+Go's interface-based design makes mocking straightforward — define an interface, implement a mock that satisfies it, and pass the mock to the code under test:
+
+```go
+// Interface
+type Store interface {
+    Get(key string) (string, error)
+}
+
+// Mock implementation
+type mockStore struct {
+    data map[string]string
+}
+
+func (m mockStore) Get(key string) (string, error) {
+    val, ok := m.data[key]
+    if !ok {
+        return nil, errors.New("not found")
+    }
+    return val, nil
+}
+
+// Usage in test
+func TestHandler(t *testing.T) {
+    store := mockStore{data: map[string]string{"key": "value"}}
+    handler := NewHandler(store)
+    // test with controlled data
+}
+```
+
+No external mocking framework is needed. The interface acts as a contract between production code and test doubles. For larger projects, code generation tools like `mockgen` (from `go.uber.org/mock`) generate mock implementations from interface definitions automatically.
+
+## Integration Tests
+
+Separate integration tests from unit tests using build tags. Add `//go:build integration` at the top of a test file to exclude it from `go test` by default:
+
+```go
+//go:build integration
+
+package db_test
+
+import "testing"
+
+func TestConnectToDatabase(t *testing.T) {
+    // runs against real database
+}
+```
+
+Run with `go test -tags=integration ./...`. This keeps slow or environment-dependent tests out of the normal test cycle while keeping them in the same repository.
