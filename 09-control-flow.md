@@ -117,6 +117,22 @@ default:
 }
 ```
 
+### Fallthrough
+
+By default, each case terminates after its statements. `fallthrough` forces execution to continue into the next case:
+
+```go
+switch grade {
+case "B":
+    fmt.Println("satisfactory")
+    fallthrough
+case "C":
+    fmt.Println("needs improvement")
+}
+```
+
+This prints both "satisfactory" and "needs improvement". The `fallthrough` keyword appears in real code (e.g., encoding packages) where multiple cases share cleanup logic. It transfers control to the next case's statements — the next case's condition is not evaluated.
+
 ## Break and Continue
 
 `break` exits the innermost loop or switch. `continue` skips to the next iteration:
