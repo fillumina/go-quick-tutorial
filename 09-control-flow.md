@@ -74,7 +74,7 @@ for {
 
 ### Range Loop
 
-`for..range` iterates over arrays, slices, maps, strings, and channels. Covered in document 14.
+`for..range` iterates over arrays, slices, maps, strings, and channels. Covered in [document 14](14-range.md).
 
 ## Switch
 

@@ -38,7 +38,7 @@ ptr++       // compile error
 ptr + 1     // compile error
 ```
 
-This restriction eliminates an entire class of memory safety bugs. For low-level operations, the `unsafe` package (document 28) provides limited capabilities.
+This restriction eliminates an entire class of memory safety bugs. For low-level operations, the `unsafe` package ([document 28](28-unsafe.md)) provides limited capabilities.
 
 ## Passing by Value vs Passing by Pointer
 

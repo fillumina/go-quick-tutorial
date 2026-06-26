@@ -76,7 +76,7 @@ Type aliases are used for renaming without creating a new type — useful for mi
 
 ## Known Aliases
 
-`byte` and `rune` (introduced in document 05) are aliases, not type definitions:
+`byte` and `rune` (introduced in [document 05](05-variables-and-types.md)) are aliases, not type definitions:
 
 ```go
 byte  // alias for uint8

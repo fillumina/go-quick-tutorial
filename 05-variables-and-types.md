@@ -159,7 +159,7 @@ s := "Hello"
 first := s[0]  // 72, the byte value of 'H'
 ```
 
-Indexing returns a `byte` (`uint8`), not a character. For Unicode text, use range iteration (covered in document 14), which yields runes.
+Indexing returns a `byte` (`uint8`), not a character. For Unicode text, use range iteration (covered in [document 14](14-range.md)), which yields runes.
 
 Converting between `string` and `[]byte` always allocates a copy — there is no zero-copy path:
 

@@ -90,4 +90,4 @@ for _, r := range s {
 
 To detect invalid UTF-8 rather than silently replacing it, use the `unicode/utf8` package.
 
-Range over a channel receives values until the channel is closed. Covered in document 22.
+Range over a channel receives values until the channel is closed. Covered in [document 22](22-channels.md).

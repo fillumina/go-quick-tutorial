@@ -84,7 +84,7 @@ Conditions where the caller has a meaningful response:
 - A network request fails — return an error; the caller can retry
 - A database query returns no rows — return an empty result
 
-These are not bugs. They are the program interacting with an unpredictable world. Use the `(result, error)` pattern from document 18.
+These are not bugs. They are the program interacting with an unpredictable world. Use the `(result, error)` pattern from [document 18](18-error-handling.md).
 
 ## Where to Place Recover
 

@@ -69,7 +69,7 @@ fmt.Println(p.Greet())  // Hi, I'm Alice
 
 ### Receivers
 
-A method uses a type as its receiver. A value receiver (`(p Person)`) gets a copy; a pointer receiver (`(p *Person)`) gets the address and can modify the original. The full explanation of value vs pointer receivers, including when to use each, is covered in document 16.
+A method uses a type as its receiver. A value receiver (`(p Person)`) gets a copy; a pointer receiver (`(p *Person)`) gets the address and can modify the original. The full explanation of value vs pointer receivers, including when to use each, is covered in [document 16](16-pointers.md).
 
 ## Struct Embedding
 
@@ -147,7 +147,7 @@ The same rule applies if an embedded type has a field with the same name as a fi
 
 ## Struct Tags
 
-Tags are metadata attached to fields as backtick-delimited strings, read via reflection (see chapter 27):
+Tags are metadata attached to fields as backtick-delimited strings, read via reflection (see [document 27](27-reflection.md)):
 
 ```go
 type User struct {
