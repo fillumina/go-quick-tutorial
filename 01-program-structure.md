@@ -89,25 +89,3 @@ person.address("main").  // OK — line ends with .
 person.address("main")   // ERROR — line ends with ), semicolon inserted
     .number
 ```
-
-## Command-Line Arguments
-
-Command-line arguments are available through `os.Args`, which returns an array of strings:
-
-- `os.Args[0]` — the program name
-- `os.Args[1]`, `os.Args[2]`, etc. — the user-supplied arguments
-
-```go
-package main
-
-import (
-    "fmt"
-    "os"
-)
-
-func main() {
-    fmt.Println(os.Args[0])  // program name, e.g. "./myapp"
-    fmt.Println(os.Args[1])  // first argument, e.g. "hello"
-    fmt.Println(os.Args[2])  // second argument, e.g. "world"
-}
-```
