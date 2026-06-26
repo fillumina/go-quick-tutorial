@@ -51,6 +51,8 @@ classoption:
   - a4paper
 ---
 
+\newpage
+
 EOF
     cat "$TMPDIR/$bname" >> "$TMPDIR/$bname.tmp"
     mv "$TMPDIR/$bname.tmp" "$TMPDIR/$bname"
