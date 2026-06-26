@@ -11,7 +11,7 @@ The reader already knows how to program. They understand types, memory, concurre
 | File | Purpose |
 |------|---------|
 | `AGENTS.md` | This file — static project definition and editorial principles |
-| `00-index.md` | Reader-facing table of contents with per-chapter coverage summaries |
+| `README.md` | Reader-facing table of contents with per-chapter coverage summaries |
 | `01-*.md` … `30-*.md` | Generated chapter documents |
 
 ---
