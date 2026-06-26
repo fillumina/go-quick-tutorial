@@ -49,6 +49,7 @@ func Contains[T comparable](slice []T, target T) bool {
     return false
 }
 ```
+
 ### Interface Constraints
 
 Any interface can serve as a constraint. The type parameter must satisfy the interface:
@@ -75,14 +76,26 @@ The `~` prefix means "any underlying type." `~int` matches `int` and any named t
 
 ### Built-in Constraints
 
-Go provides two built-in constraints:
+Go provides three built-in constraints:
 
-| Constraint | Meaning |
-|---|---|
-| `any` | Any type |
-| `comparable` | Types that support `==` and `!=` (all types except slices, maps, and functions) |
+| Constraint               | Meaning                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| `any`                    | Any type                                                                          |
+| `comparable`             | Types that support `==` and `!=` (all types except slices, maps, and functions)   |
+| `cmp.Ordered` (Go 1.21+) | Types that support ordering (`<`, `>`, etc.) — `int`, `float`, and `string` types |
 
-There is no built-in constraint for ordering (`<`, `>`, etc.). The `ordered` constraint from `golang.org/x/exp/constraints` covers `int`, `float`, and `string` types, but it is not part of the standard library.
+```go
+import "cmp"
+
+func Minimum[T cmp.Ordered](a, b T) T {
+    if a < b {
+        return a
+    }
+    return b
+}
+```
+
+You can also define generic types on structs, and their methods carry the type parameter — methods cannot introduce their own type parameters independent of the struct:
 
 ```go
 type Stack[T any] struct {
