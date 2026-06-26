@@ -93,31 +93,3 @@ func check() bool {
 ```
 
 `go vet` flags shadowing of `true`, `false`, and `nil`. Shadowing the rest is not flagged.
-
-## Iota Increments Every Line, Even When Unused
-
-`iota` is a per-line counter within a `const` block. It increments regardless of whether it is used:
-
-```go
-const (
-    A = iota   // 0
-    B = iota   // 1
-    C = 999    // 999 (iota is 2 here, unused)
-    D = iota   // 3, not 2
-)
-```
-
-## Breaking an Iota Chain With a Different Type
-
-When a line in a `const` block omits `= expression`, it reuses the type and expression from the previous line. If the previous line has a different type, `iota` produces a compile error:
-
-```go
-const (
-    A = iota     // 0
-    B = iota     // 1
-    C = "hello"  // untyped string
-    D = iota     // compile error: cannot use untyped int 3 as string
-)
-```
-
-`D` inherits `C`'s type (string) but `iota` produces an untyped int. Writing `= iota` explicitly on every line avoids this.
