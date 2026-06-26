@@ -28,7 +28,7 @@ func main() {
 }
 ```
 
-Synchronize with channels (document 22) or `sync.WaitGroup` (document 25) to wait for goroutines to complete.
+Synchronize with channels ([document 22](22-channels.md)) or `sync.WaitGroup` ([document 25](25-sync-package.md)) to wait for goroutines to complete.
 
 ## Goroutines Are Cheap
 
@@ -63,4 +63,55 @@ The race detector instruments memory accesses and reports conflicts with stack t
 
 ## Goroutine Leaks
 
-A goroutine that blocks forever accumulates silently and consumes memory. Context cancellation (document 23) addresses this by providing a mechanism to signal goroutines to stop.
+A goroutine that blocks forever accumulates silently and consumes memory. This happens when a goroutine waits on a channel that is never closed or sent to:
+
+```go
+func worker(done chan struct{}) {
+    <-done  // blocks forever if done is never closed
+}
+
+go worker(nil)  // leaked — nil channel blocks forever
+```
+
+The fix is to let the goroutine listen for cancellation alongside its blocking operation using `select` and `ctx.Done()`. See [document 23](23-context.md) for the pattern.
+
+## Waiting for Goroutines
+
+The `go` statement returns immediately. To wait for goroutines to finish, use one of these patterns:
+
+**`sync.WaitGroup`** — wait for a known number of goroutines ([document 25](25-sync-package.md)):
+
+```go
+var wg sync.WaitGroup
+
+for _, url := range urls {
+    wg.Add(1)
+    go func(u string) {
+        defer wg.Done()
+        fetch(u)
+    }(url)
+}
+
+wg.Wait()  // blocks until all goroutines call Done()
+```
+
+**Channel signaling** — wait for a single result ([document 22](22-channels.md)):
+
+```go
+ch := make(chan string)
+go func() {
+    ch <- fetch("https://example.com")
+}()
+
+result := <-ch  // blocks until the goroutine sends
+```
+
+**Context cancellation** — wait with a timeout ([document 23](23-context.md)):
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+defer cancel()
+
+go worker(ctx)
+// worker exits when it finishes or the context times out
+```
