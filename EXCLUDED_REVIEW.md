@@ -8,8 +8,7 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 
 | Excluded | Recommendation | Reason |
 |----------|---------------|--------|
-| `internal` packages | **Add back** | Important visibility concept — `internal/` directories restrict imports to siblings and ancestors. One paragraph with an example. |
-| build tags (`//go:build`) | Skip | Advanced, platform-specific. Better covered when the reader encounters them in real code. |
+| (none) | — | `internal` packages and build tags moved to 03 (Packages and Modules). |
 
 ## 02 — Imports
 
@@ -22,6 +21,8 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 
 | Excluded | Recommendation | Reason |
 |----------|---------------|--------|
+| `internal` packages | **Add back** | Important visibility concept — `internal/` directories restrict imports to siblings and ancestors. One paragraph with an example. Moved from 01. |
+| build tags (`//go:build`) | **Add back** | Controls which files are compiled into a package. Brief section showing `//go:build` directive syntax. Moved from 01. |
 | `replace` directives | **Add back** | Practical for local development. One example showing `replace old => ./local`. |
 | `go.work` workspace mode | **Add back** | Useful for monorepo development. Brief mention with the `go work init` command. |
 | module proxies | Skip | Infrastructure concern (proxy.golang.org, GOPROXY env var), not a language feature. |
@@ -222,6 +223,6 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 
 ## Summary
 
-**8 items recommended for addition:** `internal` packages, `replace` directives, `go.work` workspace mode, `fallthrough`, `t.Helper()`, `sync/atomic`, constraint interface syntax, and one each for the chapters they belong to.
+**10 items recommended for addition:** `internal` packages, build tags, `replace` directives, `go.work` workspace mode, `fallthrough`, `t.Helper()`, `sync/atomic`, constraint interface syntax, and one each for the chapters they belong to.
 
 **30+ items recommended to stay excluded** — either too advanced, too niche, covered elsewhere, or not a language feature.

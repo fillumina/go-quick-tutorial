@@ -19,6 +19,12 @@ A **package** is a directory of `.go` files sharing the same `package` declarati
 - Two packages cannot import each other — *circular imports are a compile error*
 - Any package with exported names is importable by its path — there is no separate "export" concept
 
+### Internal Packages
+
+A directory named `internal` restricts which other packages can import its contents. Conventionally, `internal` contains subdirectories, each a separate package — `internal/auth/` is imported as `"example/myapp/internal/auth"`. It is also possible to place `.go` files directly in `internal/` (making it a package itself, importable as `"example/myapp/internal"`), but this is uncommon. Only code within the same module can import these packages. A different module trying to import `"example/myapp/internal/auth"` is rejected by the compiler.
+
+A nested `internal` directory applies the same rule at a smaller scope. `storage/internal/cache` is importable only by packages inside `storage/` and its subdirectories — not even by other packages in the same module.
+
 ---
 
 ## Modules
@@ -172,6 +178,41 @@ When a module releases a breaking v2 version, the module path gains a **version 
 - The suffix appears in the *module path* and in *all import paths*
 - v1 modules have no suffix
 - Allows multiple major versions of the same module to coexist as distinct imports
+
+---
+
+## Build Tags
+
+Build tags control which `.go` files are included in a package compilation. A tag directive at the top of a file tells the compiler to include or exclude the file based on conditions like OS, architecture, or custom labels.
+
+```go
+//go:build linux
+
+package main
+```
+
+This file is compiled only on Linux. The blank line after the directive is required.
+
+**Common tag conditions:**
+
+| Tag | Meaning |
+|-----|---------|
+| `linux`, `darwin`, `windows` | Operating system |
+| `amd64`, `arm64` | CPU architecture |
+| `go1.21` | Minimum Go version |
+| Custom labels | Set with `go build -tags labelname` |
+
+**Combining conditions:**
+
+```go
+//go:build linux && amd64
+//go:build linux || darwin
+//go:build !windows
+```
+
+Use `&&` (AND), `||` (OR), and `!` (NOT) to compose conditions.
+
+**File naming convention:** Files can also be filtered by suffix — `file_linux.go` is only compiled on Linux, `file_test.go` is only included during `go test`. Build tags offer more flexibility than naming conventions alone.
 
 ---
 
