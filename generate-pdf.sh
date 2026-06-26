@@ -32,9 +32,9 @@ for f in "${INPUT_FILES[@]}"; do
     s/\x{2073}/\\textsuperscript\{3\}/g;
   ' "$f" > "$TMPDIR/$bname"
 
-  # Add YAML frontmatter to README for title page
+  # Add YAML frontmatter to preamble for title page
   if [ "$first" = true ]; then
-    cat > "$TMPDIR/$bname.tmp" <<'EOF'
+    cat > "$TMPDIR/title.md" <<'EOF'
 ---
 title: "Go Quick Tutorial"
 subtitle: "A 2-hour complete Go course"
@@ -51,11 +51,7 @@ classoption:
   - a4paper
 ---
 
-\newpage
-
 EOF
-    cat "$TMPDIR/$bname" >> "$TMPDIR/$bname.tmp"
-    mv "$TMPDIR/$bname.tmp" "$TMPDIR/$bname"
     first=false
   fi
 
@@ -63,8 +59,17 @@ EOF
   echo '%%NEWPAGE%%' >> "$TMPDIR/$bname"
 done
 
-# Concatenate all files and replace markers with raw LaTeX page break
-cat "$TMPDIR"/*.md | sed 's/%%NEWPAGE%%/\n\\newpage\n/' > "$TMPDIR/combined.md"
+# Concatenate: title page first, then all files with page breaks
+cat "$TMPDIR/title.md" > "$TMPDIR/combined.md"
+echo '%%NEWPAGE%%' >> "$TMPDIR/combined.md"
+for f in "$TMPDIR"/*.md; do
+  [ "$f" = "$TMPDIR/title.md" ] && continue
+  [ "$f" = "$TMPDIR/combined.md" ] && continue
+  cat "$f" >> "$TMPDIR/combined.md"
+done
+
+# Replace markers with raw LaTeX page break
+sed -i 's/%%NEWPAGE%%/\n\\newpage\n/' "$TMPDIR/combined.md"
 
 # Generate PDF with Pandoc using pdflatex
 pandoc \
