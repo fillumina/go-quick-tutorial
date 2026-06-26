@@ -12,8 +12,8 @@ if [ -z "$CHAPTERS" ]; then
   exit 1
 fi
 
-# Build input list: README first, then chapters
-INPUT_FILES=("$SCRIPT_DIR/README.md")
+# Build input list: preamble first, then chapters
+INPUT_FILES=("$SCRIPT_DIR/00-preamble.md")
 for ch in $CHAPTERS; do
   INPUT_FILES+=("$ch")
 done
