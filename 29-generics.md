@@ -1,6 +1,6 @@
 # 29 — Generics
 
-Type parameters allow writing functions and types that work with multiple types without losing type safety. Go added generics in version 1.18.
+Type parameters allow writing functions and parametrized types that work with multiple types without losing type safety. Go added generics in version 1.18.
 
 ## Generic Functions
 
@@ -37,7 +37,7 @@ Minimum(1.5, 2.5)    // 1.5
 Minimum("a", "b")    // compile error: string not allowed
 ```
 
-`comparable` is a built-in constraint that allows types that support `==` and `!=`:
+`comparable` allows types that support `==` and `!=`:
 
 ```go
 func Contains[T comparable](slice []T, target T) bool {
@@ -49,8 +49,40 @@ func Contains[T comparable](slice []T, target T) bool {
     return false
 }
 ```
+### Interface Constraints
 
-## Generic Types
+Any interface can serve as a constraint. The type parameter must satisfy the interface:
+
+```go
+import "io"
+
+func ReadAll[T io.Reader](r T) []byte {
+    var buf bytes.Buffer
+    io.Copy(&buf, r)
+    return buf.Bytes()
+}
+```
+
+Interface constraints and type unions can be combined:
+
+```go
+func Process[T ~int | ~float64 | io.Reader](v T) {
+    // v can be int, float64, or any type implementing io.Reader
+}
+```
+
+The `~` prefix means "any underlying type." `~int` matches `int` and any named type with `int` as its underlying type (e.g., `type MyInt int`).
+
+### Built-in Constraints
+
+Go provides two built-in constraints:
+
+| Constraint | Meaning |
+|---|---|
+| `any` | Any type |
+| `comparable` | Types that support `==` and `!=` (all types except slices, maps, and functions) |
+
+There is no built-in constraint for ordering (`<`, `>`, etc.). The `ordered` constraint from `golang.org/x/exp/constraints` covers `int`, `float`, and `string` types, but it is not part of the standard library.
 
 ```go
 type Stack[T any] struct {
