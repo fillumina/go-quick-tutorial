@@ -21,13 +21,19 @@ func init() {
 
 ## Execution Order
 
-Dependencies run first (in import order), then the importing package:
+**Within a single file**, `init` functions run top-to-bottom in the order they appear.
+
+**Across files in the same package**, files are processed in lexical (alphabetical) order by filename. For a package with `a.go` containing two `init` functions and `b.go` containing one, the order is: `a.go` init #1, `a.go` init #2, `b.go` init.
+
+**Across packages**, dependencies run first, then the importing package:
 
 ```
 package A imports package B
 ```
 
 Execution order: B's variables, B's `init`, A's variables, A's `init`, then `main()`.
+
+Relying on init order is fragile. If correctness depends on a specific sequence, use explicit initialization instead.
 
 ## Typical Uses
 
@@ -65,6 +71,8 @@ func init() {
 
 ## Limitations
 
-`init` cannot be called explicitly from user code. Circular imports prevent `init` from running at all — if package A imports package B and package B imports package A, the compiler rejects the code.
+`init` cannot be called explicitly from user code. It is the only function name allowed to appear multiple times — a single file may contain several `init` functions, and multiple files in the same package may each define their own. The compiler treats `init` as a special case, collecting all definitions and generating a hidden call sequence. Normal functions must have unique names within a package.
+
+Circular imports prevent `init` from running at all — if package A imports package B and package B imports package A, the compiler rejects the code.
 
 `init` functions make dependencies implicit and harder to trace. Use them sparingly — explicit initialization in `main()` or constructor functions is more testable and easier to reason about.
