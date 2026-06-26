@@ -107,7 +107,7 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 
 | Excluded | Recommendation | Reason |
 |----------|---------------|--------|
-| promoted field conflicts | Skip | Edge case that arises naturally from embedding. |
+| promoted field conflicts | **Add back** | Ambiguous selector is a real compile error developers encounter. Added to 15-structs with example. |
 | exhaustive tag reference | Skip | Tag formats are package-specific; document the concept, not every tag. |
 
 ## 16 — Pointers

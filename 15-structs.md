@@ -118,6 +118,33 @@ fmt.Println(p.Address.City) // explicit path, equivalent
 
 Embedding is Go's primary composition mechanism. It is not inheritance — the embedded type is not a subtype of the outer struct.
 
+### Promoted Field Conflicts
+
+When two embedded types (or an embedded type and the outer struct) share a field or method name, the promotion is ambiguous. The compiler rejects the unqualified name — you must use the explicit path through the embedded type:
+
+```go
+type Contact struct {
+    Email string
+}
+
+type Account struct {
+    Email string
+}
+
+type User struct {
+    Name    string
+    Contact // embedded
+    Account // embedded
+}
+
+u := User{}
+u.Email       // compile error: ambiguous selector u.Email
+u.Contact.Email = "a@b.c"  // OK — explicit path
+u.Account.Email = "x@y.z"  // OK — explicit path
+```
+
+The same rule applies if an embedded type has a field with the same name as a field declared directly on the outer struct. The outer struct's field takes priority for the unqualified name; the embedded field is still accessible through its type name.
+
 ## Struct Tags
 
 Tags are metadata attached to fields as backtick-delimited strings, read via reflection (see chapter 27):
