@@ -92,11 +92,14 @@ func getDB() (*Database, error) {
 }
 ```
 
-The first call to `Do` runs the function. Subsequent calls return immediately without running it again. `Do` is safe to call from multiple goroutines simultaneously.
+The first call to `Do` runs the function. Subsequent calls return immediately without running it again. `Do` is safe to call from multiple goroutines simultaneously — if a second goroutine calls `Do` while the first is still executing the function, it blocks until the function completes. This guarantees that `instance` and `initErr` are assigned before any caller reaches the `return` statement.
 
 ## Sync.Map
 
-`sync.Map` is a specialized map for high-read/low-write concurrency. It is not a general replacement for regular maps:
+`sync.Map` is a specialized concurrent map optimized for two scenarios:
+
+1. **Keys are written once, then read many times** — the map "promotes" frequently-read entries to a lock-free read path.
+2. **Different goroutines access disjoint key sets** — writes to different keys don't block each other.
 
 ```go
 var cache sync.Map
@@ -111,4 +114,4 @@ cache.Range(func(key, value any) bool {
 })
 ```
 
-Use `sync.Map` when keys are written once and read many times, or when different goroutines access disjoint key sets. For general use, a regular map with a `sync.Mutex` is simpler and often faster.
+**Trade-off vs. map + `sync.Mutex`:** A regular map with a mutex uses a single global lock — all reads and writes contend on it. `sync.Map` uses internal per-entry locking, so reads of "hot" entries are lock-free and writes to different keys don't block each other. The cost is higher memory overhead, slower writes under heavy contention, and a more verbose API (no `m[key]` syntax). For most use cases, a map with a `sync.Mutex` or `sync.RWMutex` is simpler and faster.
