@@ -25,8 +25,8 @@ These apply to every document. Hold them throughout without drift.
 
 **Known exceptions (listed to avoid re-proposing them at each review, not exhaustive):**
 
-- Document 14 mentions struct tags are "read via reflection" before reflection is covered in document 26 — the reference is incidental (the reader doesn't need to understand reflection to use struct tags) and avoids a circular dependency (reflection examples naturally use struct tags).
-- Document 18 (Type Definitions and Aliases) references `byte`/`rune` as aliases first introduced in document 05 without foreshadowing — the cross-reference is backward, not forward, and serves as clarification rather than a dependency.
+- Document 15 mentions struct tags are "read via reflection" before reflection is covered in document 27 — the reference is incidental (the reader doesn't need to understand reflection to use struct tags) and avoids a circular dependency (reflection examples naturally use struct tags).
+- Document 19 (Type Definitions and Aliases) references `byte`/`rune` as aliases first introduced in document 05 without foreshadowing — the cross-reference is backward, not forward, and serves as clarification rather than a dependency.
 
 Other forward references are acceptable when inevitable. Use judgment — an experienced developer won't object to seeing a concept before it's formally introduced.
 

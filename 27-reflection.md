@@ -96,4 +96,4 @@ v := reflect.ValueOf("hello")
 v.SetInt(42)  // panic: reflect: reflect.SetInt of string
 ```
 
-Generics (document 28) have replaced many historical uses of reflection. Modern Go code uses reflection primarily for serialization frameworks and frameworks that need to inspect struct tags.
+Generics (document 29) have replaced many historical uses of reflection. Modern Go code uses reflection primarily for serialization frameworks and frameworks that need to inspect struct tags.

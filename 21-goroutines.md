@@ -28,7 +28,7 @@ func main() {
 }
 ```
 
-Synchronize with channels (document 21) or `sync.WaitGroup` (document 24) to wait for goroutines to complete.
+Synchronize with channels (document 22) or `sync.WaitGroup` (document 25) to wait for goroutines to complete.
 
 ## Goroutines Are Cheap
 
@@ -63,4 +63,4 @@ The race detector instruments memory accesses and reports conflicts with stack t
 
 ## Goroutine Leaks
 
-A goroutine that blocks forever accumulates silently and consumes memory. Context cancellation (document 22) addresses this by providing a mechanism to signal goroutines to stop.
+A goroutine that blocks forever accumulates silently and consumes memory. Context cancellation (document 23) addresses this by providing a mechanism to signal goroutines to stop.
