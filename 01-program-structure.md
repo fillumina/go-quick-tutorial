@@ -84,8 +84,8 @@ For method chains, the dot must be at the end of the line, not the beginning of 
 
 ```go
 person.address("main").  // OK — line ends with .
-    number()
+    number
 
 person.address("main")   // ERROR — line ends with ), semicolon inserted
-    .number()
+    .number
 ```
