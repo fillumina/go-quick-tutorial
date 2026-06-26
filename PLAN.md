@@ -69,5 +69,5 @@ Changes derived from Claude Code review. Organized by priority.
 1. ~~Chapter 29 (quick fix — one paragraph)~~ ✅ Done
 2. ~~Chapter 02 → Chapter 01 (move content)~~ ❌ Cancelled — depends on import knowledge
 3. ~~Chapter 21 (expand — most writing)~~ ✅ Done
-4. New slog chapter (new file) — *pending, scope question*
+4. ~~New slog chapter (new file)~~ ✅ Done — chapter 30
 5. Cross-references (global find-and-replace pass) — *pending, low value*
