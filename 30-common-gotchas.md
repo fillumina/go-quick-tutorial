@@ -53,14 +53,32 @@ ch <- 1    // blocks forever, does not panic
 
 ## Mixing Pointer and Value Receivers Breaks Interface Satisfaction
 
+A type `T` and its pointer `*T` have different method sets. `*T` can call **both** pointer-receiver and value-receiver methods — Go automatically dereferences the pointer when calling a value-receiver method (`(*t).ValueMethod()` becomes `t.ValueMethod()`). The reverse is not true: `T` cannot call pointer-receiver methods, because Go cannot automatically take the address of a non-addressable value. Pointer receivers also allow the method to modify the original value, which value receivers cannot do.
+
+When you define methods on the same type using a mix of value and pointer receivers, only `*T` can satisfy an interface that requires both.
+
 ```go
+type T struct{}
+
 func (t T) ValueMethod() {}
 func (t *T) PointerMethod() {}
 
 var i interface{ ValueMethod(); PointerMethod() }
-i = &T{}  // OK, *T satisfies both
+i = &T{}  // OK — *T has both methods
 i = T{}   // compile error: T does not have PointerMethod
 ```
+
+The same problem appears when passing values to functions that expect an interface:
+
+```go
+func process(i interface{ ValueMethod(); PointerMethod() }) {}
+
+var t T
+process(t)   // compile error
+process(&t)  // OK
+```
+
+**Fix:** pick one receiver type per struct and use it consistently across all methods. If any method needs to mutate the receiver, use pointer receivers for all methods on that type.
 
 ## String and []byte Conversion Always Allocates
 
@@ -74,13 +92,45 @@ There is no zero-copy conversion between strings and byte slices.
 
 ## JSON Unmarshaling Numbers as Float64
 
+When unmarshaling JSON into an `any` (or `map[string]any`), the `encoding/json` package has no type information to guide it. It decodes **all** JSON numbers as `float64`, regardless of whether they look like integers:
+
 ```go
 var data any
 json.Unmarshal([]byte(`{"count": 10000000000}`), &data)
-// data["count"] is float64, large integers lose precision
+m := data.(map[string]any)
+fmt.Printf("%T\n", m["count"])  // float64, not int
 ```
 
-Use `json.Decoder.UseNumber()` or a typed target struct.
+`float64` cannot precisely represent integers larger than $2^{53}
+$. Values like IDs, timestamps, or large counters silently lose precision:
+
+```go
+m["count"].(float64)  // 10000000000 may not equal the original
+```
+
+**Two fixes:**
+
+Use a typed struct so the decoder knows the target type:
+
+```go
+type Payload struct {
+    Count int64 `json:"count"`
+}
+var p Payload
+json.Unmarshal([]byte(`{"count": 10000000000}`), &p)
+// p.Count is int64, exact value preserved
+```
+
+Or use `json.Decoder.UseNumber()` to decode numbers as `json.Number` (a string-backed type) instead of `float64`:
+
+```go
+dec := json.NewDecoder(bytes.NewReader(jsonBytes))
+dec.UseNumber()
+var data any
+dec.Decode(&data)
+m := data.(map[string]any)
+count, _ := m["count"].(json.Number).Int64()
+```
 
 ## For Range Creates Copies
 
@@ -111,7 +161,21 @@ m := map[Config]string{}  // compile error
 
 ## Predeclared Identifiers Can Be Shadowed
 
-`true`, `false`, `nil`, and all predeclared types and functions can be shadowed by local declarations:
+All predeclared identifiers can be shadowed by local declarations. Go does not treat them as reserved keywords — they are ordinary identifiers that happen to be in scope by default.
+
+**Predeclared types (20):**
+
+`string`, `bool`, `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr`, `byte`, `rune`, `float32`, `float64`, `complex64`, `complex128`, `error`, `any`
+
+**Predeclared constants (3):**
+
+`true`, `false`, `nil`
+
+**Predeclared functions (16):**
+
+`append`, `cap`, `close`, `complex`, `copy`, `delete`, `imag`, `len`, `make`, `new`, `panic`, `print`, `println`, `real`, `recover`
+
+Any of these can be shadowed:
 
 ```go
 func check() bool {
