@@ -11,9 +11,6 @@ The reader already knows how to program. They understand types, memory, concurre
 | File | Purpose |
 |------|---------|
 | `AGENTS.md` | This file — static project definition and editorial principles |
-| `PLAN.md` | Per-chapter implementation specs (Cover/Exclude/Notes). Reference only when generating or revising a specific chapter |
-| `SCRATCHPAD.md` | Running session state — current progress, decisions, active concerns. Updated each session |
-| `EXCLUDED_REVIEW.md` | Topics excluded from the original plan, with recommendations for potential inclusion |
 | `00-index.md` | Reader-facing table of contents with per-chapter coverage summaries |
 | `01-*.md` … `30-*.md` | Generated chapter documents |
 
