@@ -2,6 +2,8 @@
 
 **A 2-hour complete Go course.**
 
+[PDF version](go-quick-tutorial.pdf)
+
 A fast, dense tutorial for experienced developers who need to learn Go. Not a reference book — you have the docs for that. Not a beginner guide — you already know what a type, a pointer, or a closure is.
 
 Each chapter covers exactly one concept, builds on the previous ones, and moves on. The learning curve is gentle but constant: no padding, no detours, no noise. The structure is designed for memorization — clear sections, bold syntax, focused examples — so you can scan, retain, and move forward.
