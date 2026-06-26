@@ -29,6 +29,35 @@ fmt.Println(s.String())             // circle radius 5.00
 
 No declaration links `Circle` to `Stringer`. The match is purely structural.
 
+## Method Sets and Receiver Types
+
+A type `T` and its pointer `*T` have different method sets. `*T` includes methods defined with both value and pointer receivers — Go automatically dereferences the pointer when calling a value-receiver method (`(*t).ValueMethod()` becomes `t.ValueMethod()`). `T` only includes methods defined with value receivers, because Go cannot automatically take the address of a non-addressable value.
+
+This matters when satisfying interfaces. If a type mixes receiver types, only `*T` satisfies an interface requiring both:
+
+```go
+type T struct{}
+
+func (t T) ValueMethod() {}
+func (t *T) PointerMethod() {}
+
+var i interface{ ValueMethod(); PointerMethod() }
+i = &T{}  // OK — *T has both methods
+i = T{}   // compile error: T does not have PointerMethod
+```
+
+The same problem appears when passing values to functions that expect an interface:
+
+```go
+func process(i interface{ ValueMethod(); PointerMethod() }) {}
+
+var t T
+process(t)   // compile error
+process(&t)  // OK
+```
+
+**Fix:** pick one receiver type per struct and use it consistently across all methods. If any method needs to mutate the receiver, use pointer receivers for all methods on that type.
+
 ## Small Interfaces
 
 Interfaces are typically small — one or two methods is idiomatic. The standard library is built on small interfaces like `io.Reader` and `io.Writer`:
@@ -107,3 +136,40 @@ func describe(value any) string {
 ```
 
 The type switch variable `v` has the concrete type within each case.
+
+## Nil Pointer Assigned to Interface Is Not Nil
+
+An interface value is a two-field header: a **pointer** to the underlying data and a **type** describing it. The interface is nil only when **both** fields are nil. Assigning a nil pointer sets the type field, making the interface non-nil:
+
+```go
+var ptr *int = nil
+var i interface{} = ptr
+fmt.Println(i == nil)  // false — type is *int, pointer is nil
+```
+
+The same with `any` (the common alias for `interface{}`):
+
+```go
+var ptr *int = nil
+var i any = ptr
+fmt.Println(i == nil)  // false
+```
+
+This is a frequent source of bugs when returning errors as interfaces (remember that `error` is an interface):
+
+```go
+func f() error {
+    var err *os.PathError = nil
+    // ... some logic that might set err ...
+    return err  // returns non-nil interface even when err is nil
+}
+```
+
+Return the concrete type directly, or explicitly return `nil`:
+
+```go
+if err != nil {
+    return err
+}
+return nil
+```

@@ -228,3 +228,22 @@ r := []rune(s)          // [99 97 102 101 769], 5 runes
 ```
 
 These are the only two direct conversions from string to slice. Converting to other types (e.g., integers) requires the `strconv` package.
+
+### Slice Comparison
+
+Slices cannot be compared with `==` — it is a compile error. Two slices may reference different backing arrays with identical contents, and Go has no defined semantics for value equality of slices:
+
+```go
+a := []int{1, 2}
+b := []int{1, 2}
+a == b  // compile error: slice can only be compared to nil
+```
+
+Use `slices.Equal` from the `slices` package (Go 1.21+):
+
+```go
+import "slices"
+slices.Equal(a, b)  // true
+```
+
+Or `reflect.DeepEqual` for older Go versions. Note that `reflect.DeepEqual` is significantly slower and has different semantics for nested types.
