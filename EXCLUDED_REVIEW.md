@@ -142,8 +142,8 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 | Excluded | Recommendation | Reason |
 |----------|---------------|--------|
 | `t.Helper()` | **Add back** | Appears in real test code. One-line: marks the function as a helper so error messages point to the caller. |
-| mocking strategies | Skip | Design pattern, not a language feature. |
-| integration test build tags | Skip | Build tags are excluded elsewhere; advanced topic. |
+| mocking strategies | Already added | Interface-based mocking is covered in 20-testing with example. |
+| integration test build tags | Already added | Covered in 20-testing with `//go:build integration` example. |
 
 ## 21 — Goroutines
 
@@ -177,9 +177,9 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 
 | Excluded | Recommendation | Reason |
 |----------|---------------|--------|
-| `sync.Pool` | Skip | Performance optimization, not fundamental. |
-| `sync.Cond` | Skip | Advanced synchronization, rarely used directly. |
-| `sync/atomic` | **Add back** | `atomic.Int32`, `atomic.Bool`, etc. are practical lock-free primitives. Brief section showing `atomic.AddInt32` and `atomic.Store`/`Load`. |
+| `sync.Pool` | **Add back** | Practical for reducing allocation pressure in hot paths. Added to 25-sync-package. |
+| `sync.Cond` | Skip | Advanced synchronization, rarely used directly — channels express the same patterns more idiomatically. |
+| `sync/atomic` | **Add back** | `atomic.Int64`, `atomic.Bool`, etc. are practical lock-free primitives. Added to 25-sync-package. |
 
 ## 26 — Init Function
 
@@ -223,6 +223,6 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 
 ## Summary
 
-**13 items recommended for addition:** `internal` packages, build tags, `replace` directives, `go.work` workspace mode, `fallthrough`, `t.Helper()`, `sync/atomic`, constraint interface syntax, promoted field conflicts, stack vs heap allocation, escape analysis, and one each for the chapters they belong to.
+**14 items recommended for addition:** `internal` packages, build tags, `replace` directives, `go.work` workspace mode, `fallthrough`, `t.Helper()`, `sync/atomic`, `sync.Pool`, constraint interface syntax, promoted field conflicts, stack vs heap allocation, escape analysis, and one each for the chapters they belong to.
 
 **30+ items recommended to stay excluded** — either too advanced, too niche, covered elsewhere, or not a language feature.

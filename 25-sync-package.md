@@ -115,3 +115,53 @@ cache.Range(func(key, value any) bool {
 ```
 
 **Trade-off vs. map + `sync.Mutex`:** A regular map with a mutex uses a single global lock — all reads and writes contend on it. `sync.Map` uses internal per-entry locking, so reads of "hot" entries are lock-free and writes to different keys don't block each other. The cost is higher memory overhead, slower writes under heavy contention, and a more verbose API (no `m[key]` syntax). For most use cases, a map with a `sync.Mutex` or `sync.RWMutex` is simpler and faster.
+
+## Atomic Operations
+
+`sync/atomic` provides lock-free primitives for safe concurrent access to individual variables. Operations are guaranteed to complete without interruption.
+
+**Type-based API (Go 1.19+, preferred):**
+
+```go
+var (
+    count atomic.Int64
+    flag  atomic.Bool
+)
+
+count.Add(1)
+count.Load()
+count.Store(0)
+
+flag.Store(true)
+flag.Load()
+flag.Swap(false)
+```
+
+Available types: `atomic.Int32`, `atomic.Int64`, `atomic.Int64`, `atomic.Uint32`, `atomic.Uint64`, `atomic.Uintptr`, `atomic.Bool`, `atomic.String`, `atomic.Pointer[T]`.
+
+**Compare-and-swap** atomically updates a value only if it currently holds an expected value:
+
+```go
+// Returns true if the swap happened, false if the value was already different
+ok := count.CompareAndSwap(5, 10)
+```
+
+Use atomics for simple counters, flags, and single-variable coordination. For operations that involve multiple variables or complex invariants, use a mutex — atomics cannot guarantee consistency across more than one variable.
+
+## Pool
+
+`sync.Pool` reuses temporary objects to reduce allocation pressure and GC load. You store objects when done and retrieve them when needed, avoiding repeated allocations:
+
+```go
+var bufPool = sync.Pool{
+    New: func() any { return new(bytes.Buffer) },
+}
+
+buf := bufPool.Get().(*bytes.Buffer)
+defer bufPool.Put(buf)
+// use buf
+```
+
+`Get()` returns a previously stored object or calls `New()` if the pool is empty. `Put()` returns an object to the pool for reuse. Objects in the pool can be discarded by the garbage collector at any time — the pool is not a guaranteed cache. Reset all pooled objects with `pool.Purge()` (e.g., before a configuration change).
+
+Typical use: buffers, parsers, or other expensive-to-allocate objects created and discarded in hot paths.
