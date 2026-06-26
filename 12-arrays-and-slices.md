@@ -247,3 +247,41 @@ slices.Equal(a, b)  // true
 ```
 
 Or `reflect.DeepEqual` for older Go versions. Note that `reflect.DeepEqual` is significantly slower and has different semantics for nested types.
+
+### Multidimensional Slices
+
+A slice of slices — `[][]int` — represents a grid or matrix. Each row is an independent slice, so rows can have different lengths (a **jagged array**):
+
+```go
+grid := [][]int{
+    {1, 2, 3},
+    {4, 5},
+    {6, 7, 8, 9},
+}
+fmt.Println(grid[0][2])  // 3 — row 0, column 2
+fmt.Println(grid[2][3])  // 9 — row 2, column 3
+```
+
+Access elements with chained indexing: `grid[row][col]`. Iterate with nested loops:
+
+```go
+for i, row := range grid {
+    for j, val := range row {
+        fmt.Printf("grid[%d][%d] = %d\n", i, j, val)
+    }
+}
+```
+
+To create a rectangular grid without a literal, allocate the outer slice then each row:
+
+```go
+func makeGrid(rows, cols int) [][]int {
+    grid := make([][]int, rows)
+    for i := range grid {
+        grid[i] = make([]int, cols)
+    }
+    return grid
+}
+```
+
+The same pattern extends to three or more dimensions (`[][][]int`, etc.), though beyond two dimensions the code becomes unwieldy and a flat slice with manual index arithmetic is often clearer.
