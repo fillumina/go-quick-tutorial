@@ -115,8 +115,8 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 | Excluded | Recommendation | Reason |
 |----------|---------------|--------|
 | `unsafe.Pointer` | Skip | Covered in document 28 (Unsafe). |
-| stack vs heap allocation | Skip | Compiler decision, not programmer-controlled. |
-| escape analysis | Skip | Compiler internals. |
+| stack vs heap allocation | **Add back** | Understanding allocation patterns helps predict performance. Added to 16-pointers. |
+| escape analysis | **Add back** | Helps explain why variables end up on heap vs stack. Added to 16-pointers. |
 
 ## 17 — Interfaces
 
@@ -223,6 +223,6 @@ Topics that were excluded from the generated documents. Each entry has a recomme
 
 ## Summary
 
-**10 items recommended for addition:** `internal` packages, build tags, `replace` directives, `go.work` workspace mode, `fallthrough`, `t.Helper()`, `sync/atomic`, constraint interface syntax, and one each for the chapters they belong to.
+**13 items recommended for addition:** `internal` packages, build tags, `replace` directives, `go.work` workspace mode, `fallthrough`, `t.Helper()`, `sync/atomic`, constraint interface syntax, promoted field conflicts, stack vs heap allocation, escape analysis, and one each for the chapters they belong to.
 
 **30+ items recommended to stay excluded** — either too advanced, too niche, covered elsewhere, or not a language feature.

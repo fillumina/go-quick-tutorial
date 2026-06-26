@@ -167,3 +167,25 @@ Prefer composite literals with `&` over `new`:
 ```go
 ptr := &Counter{count: 0}   // clearer intent
 ```
+
+### Stack vs Heap
+
+Go allocates variables on either the **stack** or the **heap**. Stack allocation is fast — memory is claimed and released by moving a pointer. Heap allocation is slower and requires the garbage collector to reclaim memory.
+
+The compiler decides where a variable lives through **escape analysis**. If the compiler can prove a variable's lifetime is confined to the current function, it goes on the stack and is freed automatically when the function returns. If the variable might outlive the function — for example, a pointer returned to the caller, or a reference stored in a global — it *escapes* to the heap:
+
+```go
+func onStack() int {
+    x := 5
+    return x   // x is a simple value, stays on stack
+}
+
+func escapesToHeap() *int {
+    x := 5
+    return &x  // x must survive the function, moves to heap
+}
+```
+
+Variables on the stack are cleaned up automatically when the function returns. Heap-allocated variables are reclaimed by the **garbage collector** — a concurrent algorithm that runs most of its work alongside your program but still requires brief stop-the-world pauses (typically sub-millisecond) at key points. Under heavy allocation pressure or large heaps, these pauses can grow noticeably. Understanding escape analysis helps predict allocation patterns and avoid unnecessary heap pressure.
+
+You can inspect escape analysis with `go build -gcflags="-m"`.
