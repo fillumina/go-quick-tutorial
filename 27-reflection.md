@@ -71,6 +71,22 @@ fmt.Println(count)  // 10
 
 Calling `SetInt` on a non-addressable value (one obtained from `ValueOf(x)` without taking the address) panics.
 
+**Available setters for primitive types:**
+
+| Method | Applies to |
+|--------|------------|
+| `SetInt` | `int`, `int8`, `int16`, `int32`, `int64` |
+| `SetUint` | `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr` |
+| `SetFloat` | `float32`, `float64` |
+| `SetBool` | `bool` |
+| `SetString` | `string` |
+| `SetBytes` | `[]byte` |
+| `SetComplex` | `complex64`, `complex128` |
+
+Each setter only works on the matching kind — calling `SetInt` on a `float64` value panics.
+
+**`Set(reflect.Value)`** sets a value from another `reflect.Value`. It works for any type that is assignable: interfaces, structs, slices, maps, pointers, channels, and functions. The source value must be assignable to the destination type.
+
 ## Safety
 
 Reflection bypasses compile-time type checking. Errors surface at runtime as panics:
