@@ -75,4 +75,5 @@ Each chapter covers exactly one concept, builds on the previous ones, and moves 
 | 27 | [Reflection](27-reflection.md) | `reflect.TypeOf`, `reflect.ValueOf`, runtime type inspection |
 | 28 | [Unsafe](28-unsafe.md) | `unsafe.Pointer`, `Sizeof`, `Offsetof`, when it appears in code |
 | 29 | [Generics](29-generics.md) | Type parameters, constraints, generic types, `slices`/`maps` packages |
-| 30 | [Common Gotchas](30-common-gotchas.md) | `time.Duration` is `int64`, `strings.Builder` not concurrency-safe, JSON unmarshals numbers as `float64`, shadowing predeclared identifiers |
+| 30 | [Logging](30-logging.md) | `log` package, `log/slog` (Go 1.21+), structured logging, key-value attributes, `With`, handlers |
+| 31 | [Common Gotchas](31-common-gotchas.md) | `time.Duration` is `int64`, `strings.Builder` not concurrency-safe, JSON unmarshals numbers as `float64`, shadowing predeclared identifiers |
