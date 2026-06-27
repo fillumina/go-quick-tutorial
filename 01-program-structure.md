@@ -21,6 +21,8 @@ func main() {
 }
 ```
 
+`package main` is conventionally placed at the root of the project, not in a `main/` subdirectory. The `go` toolchain finds the entry point by package name, not directory name, so nesting it under `main/` adds no benefit and is non-idiomatic.
+
 Visibility across package boundaries is controlled entirely by capitalization. An identifier starting with an uppercase letter is exported — accessible from other packages. One starting with a lowercase letter is unexported — accessible within the package across all its files, but invisible outside.
 
 ```go
