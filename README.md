@@ -1,6 +1,6 @@
 # Go Quick Tutorial
 
-**A 2-hour complete Go course.**
+**A 1-day complete Go course.**
 
 [PDF version](go-quick-tutorial.pdf)
 

@@ -34,13 +34,15 @@ for f in "${INPUT_FILES[@]}"; do
 
   # Add YAML frontmatter to preamble for title page
   if [ "$first" = true ]; then
-    cat > "$TMPDIR/title.md" <<'EOF'
+    GIT_DATE=$(git log -1 --format=%cd --date=short 2>/dev/null || echo "2026")
+
+    cat > "$TMPDIR/title.md" <<EOF
 ---
 title: "Go Quick Tutorial"
-subtitle: "A 2-hour complete Go course"
+subtitle: "A 1-day complete Go course"
 author: "Francesco Illuminati"
-date: "2026"
-rights: "Copyright © 2026 Francesco Illuminati. Licensed under the MIT License."
+date: "$GIT_DATE"
+rights: "Copyright © 2026 Francesco Illuminati. Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)."
 titlepage: true
 titlepage-color: "FFFFFF"
 titlepage-text-color: "333333"
