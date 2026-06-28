@@ -20,6 +20,19 @@ func lessThan(a, b int) bool {
 }
 ```
 
+### No Overloading
+
+Go does not support function or method overloading. Two functions cannot share the same name within the same package, even if their parameter lists differ. The same rule applies to methods on a struct — a method name is unique to its receiver type:
+
+```go
+func add(a, b int) int { return a + b }
+
+// Compile error: add redeclared in this block
+func add(a, b float64) float64 { return a + b }
+```
+
+Use distinct names instead, such as `AddInt` and `AddFloat`, or a single function that accepts a more general type.
+
 ## Multiple Return Values
 
 Functions can return multiple values. The idiomatic pattern returns a result and an error:
